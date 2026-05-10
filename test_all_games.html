@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>滇藏骑行游戏 - 小游戏测试导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748B;
+            margin-top: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .game-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .game-city {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1E293B;
+            margin-bottom: 5px;
+        }
+
+        .game-name {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 10px;
+        }
+
+        .game-type {
+            display: inline-block;
+            background: #F1F5F9;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .game-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10B981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+
+        .test-btn {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .filter-bar {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #E2E8F0;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 滇藏骑行游戏测试中心</h1>
+            <p>Route 318 Mini-Game Testing Center</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value">16</div>
+                <div class="stat-label">小游戏总数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">6</div>
+                <div class="stat-label">游戏类型</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">完成进度</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="testedCount">0</div>
+                <div class="stat-label">已测试</div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterGames('all')">全部</button>
+            <button class="filter-btn" onclick="filterGames('rhythm')">节奏类</button>
+            <button class="filter-btn" onclick="filterGames('collect')">收集类</button>
+            <button class="filter-btn" onclick="filterGames('dodge')">躲避类</button>
+            <button class="filter-btn" onclick="filterGames('puzzle')">解谜类</button>
+            <button class="filter-btn" onclick="filterGames('race')">竞速类</button>
+            <button class="filter-btn" onclick="filterGames('simulate')">模拟类</button>
+        </div>
+
+        <div class="grid" id="gameGrid">
+            <!-- Games will be inserted here by JavaScript -->
+        </div>
+
+        <div class="footer">
+            <p>💡 点击游戏卡片开始测试 | 所有游戏支持键盘和触摸控制</p>
+            <p>🚴 滇藏骑行游戏 - Route 318 Cycling Game</p>
+        </div>
+    </div>
+
+    <script>
+        const games = [
+            {
+                icon: '🎵',
+                city: '上海',
+                name: '外滩钟声',
+                file: 'prototype_minigame_shanghai.html',
+                type: 'rhythm',
+                typeText: '节奏点击'
+            },
+            {
+                icon: '🧩',
+                city: '苏州',
+                name: '园林拼图',
+                file: 'prototype_minigame_suzhou.html',
+                type: 'puzzle',
+                typeText: '滑动拼图'
+            },
+            {
+                icon: '🍂',
+                city: '南京',
+                name: '梧桐叶落',
+                file: 'prototype_minigame_nanjing.html',
+                type: 'collect',
+                typeText: '收集点击'
+            },
+            {
+                icon: '🏯',
+                city: '武汉',
+                name: '黄鹤楼登高',
+                file: 'prototype_minigame_wuhan.html',
+                type: 'simulate',
+                typeText: '点击爬塔'
+            },
+            {
+                icon: '🏹',
+                city: '宜昌',
+                name: '屈原投江',
+                file: 'prototype_minigame_yichang.html',
+                type: 'dodge',
+                typeText: '躲避收集'
+            },
+            {
+                icon: '🚇',
+                city: '重庆',
+                name: '轻轨穿楼',
+                file: 'prototype_minigame_chongqing.html',
+                type: 'dodge',
+                typeText: '障碍躲避'
+            },
+            {
+                icon: '🐼',
+                city: '成都',
+                name: '熊猫喂食',
+                file: 'prototype_minigame_chengdu.html',
+                type: 'simulate',
+                typeText: '喂养模拟'
+            },
+            {
+                icon: '🍵',
+                city: '雅安',
+                name: '茶马古道',
+                file: 'prototype_minigame_yaan.html',
+                type: 'collect',
+                typeText: '资源收集'
+            },
+            {
+                icon: '🎸',
+                city: '康定',
+                name: '康定情歌',
+                file: 'prototype_minigame.html',
+                type: 'rhythm',
+                typeText: '音乐节奏'
+            },
+            {
+                icon: '📸',
+                city: '新都桥',
+                name: '光影捕捉',
+                file: 'prototype_minigame_xinduqiao.html',
+                type: 'collect',
+                typeText: '拍照模拟'
+            },
+            {
+                icon: '🏇',
+                city: '理塘',
+                name: '赛马节',
+                file: 'prototype_minigame_litang.html',
+                type: 'race',
+                typeText: '竞速赛跑'
+            },
+            {
+                icon: '💃',
+                city: '巴塘',
+                name: '弦子舞',
+                file: 'prototype_minigame_batang.html',
+                type: 'rhythm',
+                typeText: '舞蹈节奏'
+            },
+            {
+                icon: '🌸',
+                city: '林芝',
+                name: '桃花盛开',
+                file: 'prototype_minigame_linzhi.html',
+                type: 'collect',
+                typeText: '花瓣收集'
+            },
+            {
+                icon: '🚣',
+                city: '工布江达',
+                name: '尼洋河漂流',
+                file: 'prototype_minigame_gongbo.html',
+                type: 'dodge',
+                typeText: '河流冒险'
+            },
+            {
+                icon: '🏛️',
+                city: '墨竹工卡',
+                name: '松赞干布猜谜',
+                file: 'prototype_minigame_maizho.html',
+                type: 'puzzle',
+                typeText: '知识问答'
+            },
+            {
+                icon: '🙏',
+                city: '拉萨',
+                name: '朝圣之路',
+                file: 'prototype_minigame_lhasa.html',
+                type: 'simulate',
+                typeText: '朝圣模拟'
+            }
+        ];
+
+        let testedGames = new Set();
+
+        function renderGames(gamesToShow = games) {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+
+            gamesToShow.forEach((game, index) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                
+                card.innerHTML = `
+                    <div class="game-status"></div>
+                    <div class="game-icon">${game.icon}</div>
+                    <div class="game-city">${game.city}</div>
+                    <div class="game-name">${game.name}</div>
+                    <span class="game-type">${game.typeText}</span>
+                    <a href="file:///D:/FFOutput/%E6%BB%87%E8%97%8F%E9%AA%91%E8%A1%8C%E6%B8%B8%E6%88%8F/${game.file}" 
+                       target="_blank" 
+                       class="test-btn"
+                       onclick="markTested(${index})">
+                        ▶️ 开始测试
+                    </a>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function markTested(index) {
+            testedGames.add(index);
+            document.getElementById('testedCount').textContent = testedGames.size;
+        }
+
+        function filterGames(type) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Filter games
+            if (type === 'all') {
+                renderGames(games);
+            } else {
+                const filtered = games.filter(game => game.type === type);
+                renderGames(filtered);
+            }
+        }
+
+        // Initial render
+        renderGames();
+
+        // Keyboard shortcut
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' || e.key === '?') {
+                e.preventDefault();
+                document.querySelector('.filter-bar').scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>

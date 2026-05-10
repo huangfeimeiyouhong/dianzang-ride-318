@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>骑行318 - 社交/排行榜</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+            opacity:0;
+            animation: pageLoad 0.6s ease-out 0.1s forwards;
+        }
+
+        @keyframes pageLoad {
+            from { opacity:0; transform: translateY(20px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        /* 顶部状态栏 */
+        .status-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top:0;
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity:0; }
+            to { transform: translateY(0); opacity:1; }
+        }
+
+        .energy-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #FFF9C4 0%, #FFE082 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .energy-display:hover {
+            transform: scale(1.05);
+        }
+
+        .energy-icon {
+            width: 24px;
+            height: 24px;
+            background: #FF6B35;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            animation: energyPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes energyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .energy-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #E65100;
+        }
+
+        .level-badge {
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            animation: badgeAppear 0.6s ease-out 0.3s both;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .level-badge:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes badgeAppear {
+            from { opacity:0; transform: scale(0); }
+            to { opacity:1; transform: scale(1); }
+        }
+
+        /* 标签切换 */
+        .tab-bar {
+            display: flex;
+            background: white;
+            margin: 16px;
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            animation: slideUp 0.6s ease-out 0.4s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity:0; transform: translateY(20px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            font-size: 15px;
+            color: #666;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width:0;
+            height:0;
+            border-radius: 50%;
+            background: rgba(91, 181, 162, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .tab-item:active::before {
+            width: 300px;
+            height: 300px;
+            opacity:0;
+        }
+
+        .tab-item:hover {
+            background: rgba(91, 181, 162, 0.05);
+        }
+
+        .tab-item.active {
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(91, 181, 162, 0.4);
+            animation: tabActive 0.3s ease-out;
+        }
+
+        @keyframes tabActive {
+            from { transform: scale(0.95); }
+            to { transform: scale(1); }
+        }
+
+        /* 排行榜页面 */
+        .leaderboard-section {
+            padding:0 16px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity:0; }
+            to { opacity:1; }
+        }
+
+        .leaderboard-header {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(255, 160, 0, 0.4);
+            animation: headerBounce 0.6s ease-out 0.5s both;
+            transition: transform 0.3s ease;
+        }
+
+        .leaderboard-header:hover {
+            transform: translateY(-2px);
+        }
+
+        @keyframes headerBounce {
+            0% { opacity:0; transform: scale(0.8) translateY(-20px); }
+            100% { opacity:1; transform: scale(1) translateY(0); }
+        }
+
+        .leaderboard-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .leaderboard-subtitle {
+            font-size: 14px;
+            opacity:0.9;
+        }
+
+        .my-rank {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            animation: slideInLeft 0.5s ease-out 0.6s both;
+            transition: transform 0.3s ease;
+        }
+
+        .my-rank:hover {
+            transform: translateX(4px);
+        }
+
+        @keyframes slideInLeft {
+            from { opacity:0; transform: translateX(-30px); }
+            to { opacity:1; transform: translateX(0); }
+        }
+
+        .my-rank-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink:0;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(91, 181, 162, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(91, 181, 162, 0); }
+        }
+
+        .my-rank-info {
+            flex: 1;
+        }
+
+        .my-rank-label {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 4px;
+        }
+
+        .my-rank-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .my-rank-change {
+            text-align: right;
+        }
+
+        .change-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .change-value.up {
+            color: #4CAF50;
+            animation: changePulse 1s ease-out;
+        }
+
+        @keyframes changePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .change-value.down {
+            color: #F44336;
+        }
+
+        .change-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .rank-list {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .rank-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #F5F5F5;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: rankAppear 0.5s ease-out both;
+        }
+
+        .rank-item:nth-child(1) { animation-delay: 0.7s; }
+        .rank-item:nth-child(2) { animation-delay: 0.8s; }
+        .rank-item:nth-child(3) { animation-delay: 0.9s; }
+        .rank-item:nth-child(4) { animation-delay: 1.0s; }
+        .rank-item:nth-child(5) { animation-delay: 1.1s; }
+        .rank-item:nth-child(6) { animation-delay: 1.2s; }
+
+        @keyframes rankAppear {
+            from { opacity:0; transform: translateX(-20px); }
+            to { opacity:1; transform: translateX(0); }
+        }
+
+        .rank-item:hover {
+            background: #F5F5F5;
+            transform: translateX(4px);
+        }
+
+        .rank-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank-number {
+            width: 40px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #999;
+            text-align: center;
+            flex-shrink:0;
+            transition: transform 0.3s ease;
+        }
+
+        .rank-item:hover .rank-number {
+            transform: scale(1.2);
+        }
+
+        .rank-number.top1 {
+            color: #FFD700;
+            animation: crownBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes crownBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .rank-number.top2 {
+            color: #C0C0C0;
+        }
+
+        .rank-number.top3 {
+            color: #CD7F32;
+        }
+
+        .rank-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 12px;
+            flex-shrink:0;
+            transition: transform 0.3s ease;
+        }
+
+        .rank-item:hover .rank-avatar {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .rank-info {
+            flex: 1;
+        }
+
+        .rank-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .rank-detail {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .rank-score {
+            text-align: right;
+        }
+
+        .rank-distance {
+            font-size: 18px;
+            font-weight: 700;
+            color: #5BB5A2;
+            margin-bottom: 4px;
+        }
+
+        .rank-city {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* 好友页面 */
+        .friends-section {
+            padding:0 16px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .friends-header {
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(91, 181, 162, 0.4);
+            animation: headerBounce 0.6s ease-out 0.5s both;
+            transition: transform 0.3s ease;
+        }
+
+        .friends-header:hover {
+            transform: translateY(-2px);
+        }
+
+        .friends-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .friends-subtitle {
+            font-size: 14px;
+            opacity:0.9;
+        }
+
+        .friend-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .friend-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: slideInRight 0.5s ease-out both;
+        }
+
+        .friend-card:nth-child(1) { animation-delay: 0.6s; }
+        .friend-card:nth-child(2) { animation-delay: 0.7s; }
+        .friend-card:nth-child(3) { animation-delay: 0.8s; }
+        .friend-card:nth-child(4) { animation-delay: 0.9s; }
+        .friend-card:nth-child(5) { animation-delay: 1.0s; }
+
+        @keyframes slideInRight {
+            from { opacity:0; transform: translateX(30px); }
+            to { opacity:1; transform: translateX(0); }
+        }
+
+        .friend-card:hover {
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .friend-card:active {
+            transform: translateX(4px) scale(0.98);
+        }
+
+        .friend-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            flex-shrink:0;
+            transition: transform 0.3s ease;
+        }
+
+        .friend-card:hover .friend-avatar {
+            transform: rotate(-10deg) scale(1.1);
+        }
+
+        .friend-info {
+            flex: 1;
+        }
+
+        .friend-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .friend-status {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .friend-status.riding {
+            color: #5BB5A2;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity:1; }
+            50% { opacity:0.6; }
+        }
+
+        .friend-status.online {
+            color: #4CAF50;
+        }
+
+        .friend-status.offline {
+            color: #999;
+        }
+
+        .friend-action {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .friend-action::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width:0;
+            height:0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .friend-action:active::before {
+            width: 400px;
+            height: 400px;
+            opacity:0;
+        }
+
+        .btn-challenge {
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-challenge:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-message {
+            background: #F5F5F5;
+            color: #666;
+        }
+
+        .btn-message:hover {
+            background: #E0E0E0;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom:0;
+            left:0;
+            right:0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            z-index: 100;
+            animation: slideUp 0.6s ease-out 0.9s both;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover {
+            background: rgba(91, 181, 162, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-item:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .nav-item.active {
+            color: #5BB5A2;
+            background: rgba(91, 181, 162, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover .nav-icon {
+            transform: scale(1.2);
+        }
+
+        .nav-label {
+            font-weight: 500;
+        }
+
+        /* Toast通知 */
+        .toast {
+            position: fixed;
+            top: 60px;
+            left:50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <div class="energy-display" onclick="animateEnergy()">
+            <div class="energy-icon">⚡</div>
+            <span class="energy-value" id="energy-value">2,847</span>
+        </div>
+        <div class="level-badge" onclick="showLevelInfo()">Lv.12 🚴</div>
+    </div>
+
+    <!-- 标签切换 -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('leaderboard', this)">🏆 排行榜</div>
+        <div class="tab-item" onclick="switchTab('friends', this)">👥 好友</div>
+    </div>
+
+    <!-- 排行榜页面 -->
+    <div id="leaderboard-page" class="leaderboard-section">
+        <div class="leaderboard-header">
+            <div class="leaderboard-title">🏆 318骑行排行榜</div>
+            <div class="leaderboard-subtitle">成为征服318的传奇骑手</div>
+        </div>
+
+        <div class="my-rank">
+            <div class="my-rank-badge">42</div>
+            <div class="my-rank-info">
+                <div class="my-rank-label">我的排名</div>
+                <div class="my-rank-value">第 42 名</div>
+            </div>
+            <div class="my-rank-change">
+                <div class="change-value up" id="change-value">↑ 5</div>
+                <div class="change-label">较昨日</div>
+            </div>
+        </div>
+
+        <div class="rank-list">
+            <div class="rank-item">
+                <div class="rank-number top1">1</div>
+                <div class="rank-avatar">🚴</div>
+                <div class="rank-info">
+                    <div class="rank-name">骑行侠</div>
+                    <div class="rank-detail">Lv.45 | 已完成全程</div>
+                </div>
+                <div class="rank-score">
+                    <div class="rank-distance">5476 km</div>
+                    <div class="rank-city">📍 拉萨</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <div class="rank-number top2">2</div>
+                <div class="rank-avatar">🚵</div>
+                <div class="rank-info">
+                    <div class="rank-name">风之子</div>
+                    <div class="rank-detail">Lv.42 | 距离终点85km</div>
+                </div>
+                <div class="rank-score">
+                    <div class="rank-distance">5391 km</div>
+                    <div class="rank-city">📍 墨竹工卡</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <div class="rank-number top3">3</div>
+                <div class="rank-avatar">🚴♀️</div>
+                <div class="rank-info">
+                    <div class="rank-name">追风少女</div>
+                    <div class="rank-detail">Lv.38 | 距离终点530km</div>
+                </div>
+                <div class="rank-score">
+                    <div class="rank-distance">4946 km</div>
+                    <div class="rank-city">📍 林芝</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <div class="rank-number">4</div>
+                <div class="rank-avatar">🚴♂️</div>
+                <div class="rank-info">
+                    <div class="rank-name">高原狼</div>
+                    <div class="rank-detail">Lv.35 | 距离终点830km</div>
+                </div>
+                <div class="rank-score">
+                    <div class="rank-distance">4646 km</div>
+                    <div class="rank-city">📍 波密</div>
+                </div>
+            </div>
+
+            <div class="rank-item">
+                <div class="rank-number">5</div>
+                <div class="rank-avatar">🚵‍♂️</div>
+                <div class="rank-info">
+                    <div class="rank-name">318老司机</div>
+                    <div class="rank-detail">Lv.33 | 距离终点1130km</div>
+                </div>
+                <div class="rank-score">
+                    <div class="rank-distance">4346 km</div>
+                    <div class="rank-city">📍 康定</div>
+                </div>
+            </div>
+
+            <div class="rank-item" style="background: #FFF9C4;">
+                <div class="rank-number" style="color: #5BB5A2; font-weight: 700;">42</div>
+                <div class="rank-avatar" style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);">🚴</div>
+                <div class="rank-info">
+                    <div class="rank-name">我（Zoe）</div>
+                    <div class="rank-detail">Lv.12 | 距离终点2920km</div>
+                </div>
+                <div class="rank-score">
+                    <div class="rank-distance">2556 km</div>
+                    <div class="rank-city">📍 雅安</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 好友页面 -->
+    <div id="friends-page" class="friends-section">
+        <div class="friends-header">
+            <div class="friends-title">👥 骑行伙伴</div>
+            <div class="friends-subtitle">和好友一起征服318</div>
+        </div>
+
+        <div class="friend-list">
+            <div class="friend-card">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);">🚴♂️</div>
+                <div class="friend-info">
+                    <div class="friend-name">小明</div>
+                    <div class="friend-status riding">🚴 正在骑行 · 雅安 → 康定</div>
+                </div>
+                <div class="friend-action btn-challenge" onclick="challenge('小明')">
+                    挑战
+                </div>
+            </div>
+
+            <div class="friend-card">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);">🚵‍♀️</div>
+                <div class="friend-info">
+                    <div class="friend-name">小红</div>
+                    <div class="friend-status online">🟢 在线 · 成都休息中</div>
+                </div>
+                <div class="friend-action btn-message" onclick="message('小红')">
+                    消息
+                </div>
+            </div>
+
+            <div class="friend-card">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);">🚴</div>
+                <div class="friend-info">
+                    <div class="friend-name">阿强</div>
+                    <div class="friend-status riding">🚴 正在骑行 · 武汉 → 宜昌</div>
+                </div>
+                <div class="friend-action btn-challenge" onclick="challenge('阿强')">
+                    挑战
+                </div>
+            </div>
+
+            <div class="friend-card">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">🚵</div>
+                <div class="friend-info">
+                    <div class="friend-name">老李</div>
+                    <div class="friend-status offline">⚫ 离线 · 昨天活跃</div>
+                </div>
+                <div class="friend-action btn-message" onclick="message('老李')">
+                    消息
+                </div>
+            </div>
+
+            <div class="friend-card">
+                <div class="friend-avatar" style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);">🚴♀️</div>
+                <div class="friend-info">
+                    <div class="friend-name">小美</div>
+                    <div class="friend-status online">🟢 在线 · 拉萨已抵达 🎉</div>
+                </div>
+                <div class="friend-action btn-message" onclick="message('小美')">
+                    祝贺
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="navigateTo('map')">
+            <span class="nav-icon">🗺️</span>
+            <span class="nav-label">地图</span>
+        </div>
+        <div class="nav-item active">
+            <span class="nav-icon">👥</span>
+            <span class="nav-label">社交</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('backpack')">
+            <span class="nav-icon">🎒</span>
+            <span class="nav-label">背包</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('profile')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">我的</span>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 标签切换（带动画）
+        function switchTab(page, element) {
+            // 添加页面切换动画
+            const currentPage = document.querySelector('.leaderboard-section:not([style*="display: none"]), .friends-section:not([style*="display: none"])');
+            if (currentPage) {
+                currentPage.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    currentPage.style.display = 'none';
+
+                    // 显示新页面
+                    const newPage = document.getElementById(page + '-page');
+                    newPage.style.display = 'block';
+                    newPage.style.animation = 'fadeIn 0.5s ease-out';
+                }, 300);
+            }
+
+            // 更新标签状态
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            element.classList.add('active');
+
+            // 显示Toast提示
+            const pageNames = {
+                'leaderboard': '排行榜',
+                'friends': '好友列表'
+            };
+            showToast('查看' + pageNames[page]);
+        }
+
+        // 挑战好友
+        function challenge(name) {
+            showToast('向 ' + name + ' 发起挑战！');
+            setTimeout(() => {
+                alert(`向 ${name} 发起挑战！\n\n挑战内容：康定情歌小游戏PK\n赌注：500能量\n\n等待对方接受...`);
+            }, 500);
+        }
+
+        // 发送消息
+        function message(name) {
+            showToast('打开与 ' + name + ' 的聊天');
+        }
+
+        // 能量数字动画
+        function animateEnergy() {
+            const energyValue = document.getElementById('energy-value');
+            energyValue.style.transition = 'transform 0.3s ease';
+            energyValue.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                energyValue.style.transform = 'scale(1)';
+            }, 300);
+        }
+
+        // 显示等级信息
+        function showLevelInfo() {
+            showToast('等级：Lv.12 | 经验值：2847/3500');
+        }
+
+        // 页面导航
+        function navigateTo(page) {
+            const pageNames = {
+                'map': '地图',
+                'backpack': '背包',
+                'profile': '个人中心'
+            };
+            showToast('跳转到' + pageNames[page] + '页面...');
+
+            setTimeout(() => {
+                switch(page) {
+                    case 'map':
+                        window.location.href = 'prototype_main.html';
+                        break;
+                    case 'backpack':
+                        window.location.href = 'prototype_backpack.html';
+                        break;
+                    case 'profile':
+                        window.location.href = 'prototype_profile.html';
+                        break;
+                }
+            }, 500);
+        }
+
+        // 显示Toast通知
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 添加fadeOut动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                to { opacity: 0; transform: translateY(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

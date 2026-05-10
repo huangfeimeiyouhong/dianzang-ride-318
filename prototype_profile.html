@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>骑行318 - 个人中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #E3F2FD 0%, #BBDEFB 100%);
+            min-height: 100vh;
+            padding-bottom: 80px;
+            opacity: 0;
+            animation: pageLoad 0.6s ease-out 0.1s forwards;
+        }
+
+        @keyframes pageLoad {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 顶部状态栏 */
+        .status-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .energy-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #FFF9C4 0%, #FFE082 100%);
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .energy-display:hover {
+            transform: scale(1.05);
+        }
+
+        .energy-icon {
+            width: 24px;
+            height: 24px;
+            background: #FF6B35;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            animation: energyPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes energyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .energy-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #E65100;
+            transition: transform 0.3s ease;
+        }
+
+        .energy-value.animate {
+            animation: valueJump 0.5s ease-out;
+        }
+
+        @keyframes valueJump {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); color: #FF6B35; }
+            100% { transform: scale(1); }
+        }
+
+        .level-badge {
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            animation: badgeAppear 0.6s ease-out 0.3s both;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .level-badge:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes badgeAppear {
+            from { opacity: 0; transform: scale(0); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 个人资料头部 */
+        .profile-header {
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            padding: 40px 20px 32px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            animation: headerSlide 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes headerSlide {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(10%, 10%); }
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            margin: 0 auto 16px;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            animation: avatarBounce 1s ease-out 0.6s both;
+        }
+
+        @keyframes avatarBounce {
+            0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out 0.7s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-id {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out 0.8s both;
+        }
+
+        .profile-location {
+            font-size: 14px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out 0.9s both;
+        }
+
+        /* 数据统计 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 20px 16px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 2;
+            animation: statsSlide 0.8s ease-out 1s both;
+        }
+
+        @keyframes statsSlide {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            animation: statAppear 0.5s ease-out both;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 1.1s; }
+        .stat-card:nth-child(2) { animation-delay: 1.2s; }
+        .stat-card:nth-child(3) { animation-delay: 1.3s; }
+        .stat-card:nth-child(4) { animation-delay: 1.4s; }
+
+        @keyframes statAppear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* 功能列表 */
+        .menu-section {
+            padding: 0 16px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.6s ease-out 1.2s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .menu-group {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 12px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #F5F5F5;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(91, 181, 162, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .menu-item:active::after {
+            width: 500px;
+            height: 500px;
+            opacity: 0;
+        }
+
+        .menu-item:hover {
+            background: #F5F5F5;
+            padding-left: 24px;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover .menu-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .menu-info {
+            flex: 1;
+        }
+
+        .menu-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .menu-desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .menu-arrow {
+            color: #CCC;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover .menu-arrow {
+            transform: translateX(4px);
+            color: #5BB5A2;
+        }
+
+        /* 骑行日志 */
+        .journal-section {
+            padding: 0 16px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.6s ease-out 1.4s both;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            animation: slideInLeft 0.5s ease-out 1.5s both;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .journal-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .journal-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #F5F5F5;
+            transition: all 0.3s ease;
+            animation: journalSlide 0.5s ease-out both;
+        }
+
+        .journal-item:nth-child(1) { animation-delay: 1.6s; }
+        .journal-item:nth-child(2) { animation-delay: 1.7s; }
+        .journal-item:nth-child(3) { animation-delay: 1.8s; }
+
+        @keyframes journalSlide {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .journal-item:hover {
+            background: #FAFAFA;
+            border-radius: 8px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .journal-item:last-child {
+            border-bottom: none;
+        }
+
+        .journal-date {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #5BB5A2 0%, #4CAF8A 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .journal-item:hover .journal-date {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .journal-day {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .journal-month {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        .journal-info {
+            flex: 1;
+        }
+
+        .journal-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .journal-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            z-index: 100;
+            animation: slideUp 0.6s ease-out 1.6s both;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover {
+            background: rgba(91, 181, 162, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-item:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .nav-item.active {
+            color: #5BB5A2;
+            background: rgba(91, 181, 162, 0.1);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover .nav-icon {
+            transform: scale(1.2);
+        }
+
+        .nav-label {
+            font-weight: 500;
+        }
+
+        /* Toast通知 */
+        .toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            z-index: 2000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 状态栏 -->
+    <div class="status-bar">
+        <div class="energy-display" onclick="animateEnergy()">
+            <div class="energy-icon">⚡</div>
+            <span class="energy-value" id="energy-value">2,847</span>
+        </div>
+        <div class="level-badge" onclick="showLevelInfo()">Lv.12 🚴</div>
+    </div>
+
+    <!-- 个人资料头部 -->
+    <div class="profile-header">
+        <div class="profile-avatar" onclick="showAvatarOptions()">🚴♀️</div>
+        <div class="profile-name">Zoe</div>
+        <div class="profile-id">ID: 318Zoe2024</div>
+        <div class="profile-location">📍 当前位置：雅安</div>
+    </div>
+
+    <!-- 数据统计 -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🚴</div>
+            <div class="stat-value">2556</div>
+            <div class="stat-label">骑行公里</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⛰️</div>
+            <div class="stat-value">8</div>
+            <div class="stat-label">通过城市</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎮</div>
+            <div class="stat-value">23</div>
+            <div class="stat-label">小游戏</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-value">15</div>
+            <div class="stat-label">连续天数</div>
+        </div>
+    </div>
+
+    <!-- 功能菜单 -->
+    <div class="menu-section">
+        <div class="menu-group">
+            <div class="menu-item" onclick="navigateTo('character')">
+                <div class="menu-icon" style="background: #E3F2FD;">🎨</div>
+                <div class="menu-info">
+                    <div class="menu-title">角色定制</div>
+                    <div class="menu-desc">更换头像、装备外观</div>
+                </div>
+                <div class="menu-arrow">›</div>
+            </div>
+
+            <div class="menu-item" onclick="navigateTo('achievements')">
+                <div class="menu-icon" style="background: #FFF9C4;">🏆</div>
+                <div class="menu-info">
+                    <div class="menu-title">成就徽章</div>
+                    <div class="menu-desc">查看已解锁的成就</div>
+                </div>
+                <div class="menu-arrow">›</div>
+            </div>
+
+            <div class="menu-item" onclick="navigateTo('statistics')">
+                <div class="menu-icon" style="background: #E8F5E9;">📊</div>
+                <div class="menu-info">
+                    <div class="menu-title">骑行数据统计</div>
+                    <div class="menu-desc">步数、里程、海拔曲线</div>
+                </div>
+                <div class="menu-arrow">›</div>
+            </div>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-item" onclick="navigateTo('settings')">
+                <div class="menu-icon" style="background: #F3E5F5;">⚙️</div>
+                <div class="menu-info">
+                    <div class="menu-title">设置</div>
+                    <div class="menu-desc">通知、隐私、账号管理</div>
+                </div>
+                <div class="menu-arrow">›</div>
+            </div>
+
+            <div class="menu-item" onclick="navigateTo('help')">
+                <div class="menu-icon" style="background: #FFF3E0;">❓</div>
+                <div class="menu-info">
+                    <div class="menu-title">帮助与反馈</div>
+                    <div class="menu-desc">常见问题、联系客服</div>
+                </div>
+                <div class="menu-arrow">›</div>
+            </div>
+
+            <div class="menu-item" onclick="navigateTo('about')">
+                <div class="menu-icon" style="background: #E8EAF6;">ℹ️</div>
+                <div class="menu-info">
+                    <div class="menu-title">关于骑行318</div>
+                    <div class="menu-desc">版本号、开发团队</div>
+                </div>
+                <div class="menu-arrow">›</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 骑行日志 -->
+    <div class="journal-section">
+        <div class="section-title">📝 最近骑行日志</div>
+        <div class="journal-card">
+            <div class="journal-item">
+                <div class="journal-date">
+                    <div class="journal-day">9</div>
+                    <div class="journal-month">5月</div>
+                </div>
+                <div class="journal-info">
+                    <div class="journal-title">雅安 → 康定</div>
+                    <div class="journal-desc">骑行85公里，海拔爬升1200米，在康定情歌广场听了当地人唱歌 🎵</div>
+                </div>
+            </div>
+
+            <div class="journal-item">
+                <div class="journal-date">
+                    <div class="journal-day">8</div>
+                    <div class="journal-month">5月</div>
+                </div>
+                <div class="journal-info">
+                    <div class="journal-title">成都 → 雅安</div>
+                    <div class="journal-desc">骑行75公里，在碧峰峡看了大熊猫，超可爱！🐼</div>
+                </div>
+            </div>
+
+            <div class="journal-item">
+                <div class="journal-date">
+                    <div class="journal-day">7</div>
+                    <div class="journal-month">5月</div>
+                </div>
+                <div class="journal-info">
+                    <div class="journal-title">重庆 → 成都</div>
+                    <div class="journal-desc">骑行280公里，终于到成都了！吃了火锅庆祝 🍲</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="navigateTo('map')">
+            <span class="nav-icon">🗺️</span>
+            <span class="nav-label">地图</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('backpack')">
+            <span class="nav-icon">🎒</span>
+            <span class="nav-label">背包</span>
+        </div>
+        <div class="nav-item" onclick="navigateTo('social')">
+            <span class="nav-icon">👥</span>
+            <span class="nav-label">社交</span>
+        </div>
+        <div class="nav-item active" onclick="navigateTo('profile')">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">我的</span>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // 导航功能
+        function navigateTo(page) {
+            const messages = {
+                'map': '跳转到地图页面...',
+                'backpack': '跳转到背包页面...',
+                'social': '跳转到社交页面...',
+                'profile': '刷新个人中心',
+                'character': '打开角色定制页面',
+                'achievements': '打开成就徽章页面',
+                'statistics': '打开骑行数据统计',
+                'settings': '打开设置页面',
+                'help': '打开帮助与反馈',
+                'about': '打开关于页面'
+            };
+            
+            showToast(messages[page]);
+            
+            if (['map', 'backpack', 'social', 'profile'].includes(page)) {
+                setTimeout(() => {
+                    const pages = {
+                        'map': 'prototype_main.html',
+                        'backpack': 'prototype_backpack.html',
+                        'social': 'prototype_social.html',
+                        'profile': 'prototype_profile.html'
+                    };
+                    window.location.href = pages[page];
+                }, 500);
+            }
+        }
+
+        // 能量数字动画
+        function animateEnergy() {
+            const energyValue = document.getElementById('energy-value');
+            energyValue.classList.add('animate');
+            setTimeout(() => {
+                energyValue.classList.remove('animate');
+            }, 500);
+        }
+
+        // 显示等级信息
+        function showLevelInfo() {
+            showToast('等级：Lv.12 | 经验值：2847/3500');
+        }
+
+        // 显示头像选项
+        function showAvatarOptions() {
+            showToast('更换头像功能开发中...');
+        }
+
+        // 显示Toast通知
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // 页面加载完成后添加滚动动画
+        window.addEventListener('load', function() {
+            // 监听滚动，添加渐入动画
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            // 观察所有可动画元素
+            document.querySelectorAll('.menu-item, .journal-item').forEach(item => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(item);
+            });
+        });
+
+        // 添加点击效果
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.menu-item') || e.target.closest('.journal-item') || e.target.closest('.stat-card')) {
+                createClickEffect(e.clientX, e.clientY);
+            }
+        });
+
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(91, 181, 162, 0.3);
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+                animation: clickRipple 0.6s ease-out forwards;
+                z-index: 9999;
+            `;
+
+            document.body.appendChild(effect);
+
+            setTimeout(() => {
+                effect.remove();
+            }, 600);
+        }
+
+        // 添加ripple动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes clickRipple {
+                0% { width: 0; height: 0; opacity: 1; }
+                100% { width: 100px; height: 100px; opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>滇藏骑行游戏 - 小游戏测试导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .stats {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748B;
+            margin-top: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .game-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .game-city {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1E293B;
+            margin-bottom: 5px;
+        }
+
+        .game-name {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 10px;
+        }
+
+        .game-type {
+            display: inline-block;
+            background: #F1F5F9;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .test-btn {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .info-box {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-box p {
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .file-list {
+            background: #F8FAFC;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #64748B;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 滇藏骑行游戏测试中心</h1>
+            <p>Route 318 Mini-Game Testing Center</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value">16</div>
+                <div class="stat-label">小游戏总数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">6</div>
+                <div class="stat-label">游戏类型</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">完成进度</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>📋 测试说明</h3>
+            <p><strong>方法1：</strong>直接复制下方文件路径，在浏览器中打开</p>
+            <p><strong>方法2：</strong>在VS Code中右键文件 → Open with Live Server</p>
+            <p><strong>方法3：</strong>双击HTML文件在默认浏览器中打开</p>
+        </div>
+
+        <div class="info-box">
+            <h3>🎯 所有小游戏文件列表</h3>
+            <p>复制以下路径到浏览器地址栏，或在文件管理器中双击打开：</p>
+            <div class="file-list" id="fileList">
+                <!-- Files will be listed here -->
+            </div>
+        </div>
+
+        <div class="grid" id="gameGrid">
+            <!-- Game cards will be inserted here -->
+        </div>
+
+        <div class="footer">
+            <p>💡 每个游戏都是独立的HTML文件，可以直接在浏览器中打开测试</p>
+            <p>🚴 滇藏骑行游戏 - Route 318 Cycling Game</p>
+        </div>
+    </div>
+
+    <script>
+        const games = [
+            { icon: '🎵', city: '上海', name: '外滩钟声', file: 'prototype_minigame_shanghai.html', type: '节奏点击' },
+            { icon: '🧩', city: '苏州', name: '园林拼图', file: 'prototype_minigame_suzhou.html', type: '滑动拼图' },
+            { icon: '🍂', city: '南京', name: '梧桐叶落', file: 'prototype_minigame_nanjing.html', type: '收集点击' },
+            { icon: '🏯', city: '武汉', name: '黄鹤楼登高', file: 'prototype_minigame_wuhan.html', type: '点击爬塔' },
+            { icon: '🏹', city: '宜昌', name: '屈原投江', file: 'prototype_minigame_yichang.html', type: '躲避收集' },
+            { icon: '🚇', city: '重庆', name: '轻轨穿楼', file: 'prototype_minigame_chongqing.html', type: '障碍躲避' },
+            { icon: '🐼', city: '成都', name: '熊猫喂食', file: 'prototype_minigame_chengdu.html', type: '喂养模拟' },
+            { icon: '🍵', city: '雅安', name: '茶马古道', file: 'prototype_minigame_yaan.html', type: '资源收集' },
+            { icon: '🎸', city: '康定', name: '康定情歌', file: 'prototype_minigame.html', type: '音乐节奏' },
+            { icon: '📸', city: '新都桥', name: '光影捕捉', file: 'prototype_minigame_xinduqiao.html', type: '拍照模拟' },
+            { icon: '🏇', city: '理塘', name: '赛马节', file: 'prototype_minigame_litang.html', type: '竞速赛跑' },
+            { icon: '💃', city: '巴塘', name: '弦子舞', file: 'prototype_minigame_batang.html', type: '舞蹈节奏' },
+            { icon: '🌸', city: '林芝', name: '桃花盛开', file: 'prototype_minigame_linzhi.html', type: '花瓣收集' },
+            { icon: '🚣', city: '工布江达', name: '尼洋河漂流', file: 'prototype_minigame_gongbo.html', type: '河流冒险' },
+            { icon: '🏛️', city: '墨竹工卡', name: '松赞干布猜谜', file: 'prototype_minigame_maizho.html', type: '知识问答' },
+            { icon: '🙏', city: '拉萨', name: '朝圣之路', file: 'prototype_minigame_lhasa.html', type: '朝圣模拟' }
+        ];
+
+        const basePath = 'D:\\FFOutput\\滇藏骑行游戏\\';
+
+        // Render file list
+        const fileList = document.getElementById('fileList');
+        games.forEach(game => {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+            item.textContent = basePath + game.file;
+            fileList.appendChild(item);
+        });
+
+        // Render game cards
+        const grid = document.getElementById('gameGrid');
+        games.forEach((game, index) => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            
+            card.innerHTML = `
+                <div class="game-icon">${game.icon}</div>
+                <div class="game-city">${game.city}</div>
+                <div class="game-name">${game.name}</div>
+                <span class="game-type">${game.type}</span>
+                <button class="test-btn" onclick="copyPath(${index})">
+                    📋 复制路径并打开
+                </button>
+            `;
+
+            grid.appendChild(card);
+        });
+
+        function copyPath(index) {
+            const game = games[index];
+            const fullPath = basePath + game.file;
+            
+            // Copy to clipboard
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(fullPath).then(() => {
+                    alert(`✅ 路径已复制！\n\n请：\n1. 打开浏览器\n2. 粘贴路径到地址栏\n3. 按回车打开\n\n路径：${fullPath}`);
+                }).catch(() => {
+                    showManualCopy(fullPath);
+                });
+            } else {
+                showManualCopy(fullPath);
+            }
+        }
+
+        function showManualCopy(path) {
+            alert(`请手动复制以下路径到浏览器地址栏：\n\n${path}`);
+        }
+
+        // Auto-open instruction
+        setTimeout(() => {
+            console.log('💡 提示：所有游戏文件都在 D:\\FFOutput\\滇藏骑行游戏\\ 目录下');
+            console.log('你可以直接在文件管理器中双击HTML文件打开测试');
+        }, 1000);
+    </script>
+</body>
+</html>

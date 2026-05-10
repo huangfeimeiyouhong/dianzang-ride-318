@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>骑行318 - 角色自定义</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #E3F2FD 0%, #FFFFFF 100%);
+            overflow-x: hidden;
+            opacity:0;
+            animation: pageLoad 0.6s ease-out 0.1s forwards;
+        }
+
+        @keyframes pageLoad {
+            from { opacity:0; transform: translateY(20px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        /* Phone Frame */
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+            animation: phoneFrameLoad 0.8s ease-out 0.3s forwards;
+        }
+
+        @keyframes phoneFrameLoad {
+            from { opacity:0; transform: scale(0.95); }
+            to { opacity:1; transform: scale(1); }
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 44px;
+            background: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid #E0E0E0;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity:0; }
+            to { transform: translateY(0); opacity:1; }
+        }
+
+        .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #1976D2;
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .back-btn:active {
+            transform: scale(0.9);
+        }
+
+        .page-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            animation: titleFade 0.6s ease-out 0.4s both;
+        }
+
+        @keyframes titleFade {
+            from { opacity:0; transform: translateY(-10px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        .save-btn {
+            font-size: 13px;
+            color: #1976D2;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        .save-btn:hover {
+            background: rgba(25, 118, 210, 0.1);
+        }
+
+        .save-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Character Preview */
+        .character-preview {
+            height: 350px;
+            background: linear-gradient(180deg, #E3F2FD 0%, #FFFFFF 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: previewSlide 0.8s ease-out 0.5s both;
+        }
+
+        @keyframes previewSlide {
+            from { opacity:0; transform: translateY(30px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        .character-svg {
+            width: 200px;
+            height: 280px;
+            transition: transform 0.5s ease;
+            animation: characterBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes characterBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .character-svg:hover {
+            transform: scale(1.05);
+        }
+
+        .bike-frame {
+            stroke: #8D6E63;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .wheel {
+            fill: #333333;
+            stroke: #666666;
+            stroke-width: 1;
+            animation: wheelRotate 1s linear infinite;
+            transform-origin: center;
+        }
+
+        @keyframes wheelRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .rider-head {
+            fill: #FFE0B2;
+        }
+
+        .rider-body {
+            fill: #1976D2;
+            transition: fill 0.5s ease;
+        }
+
+        .helmet {
+            fill: #C62828;
+            transition: fill 0.5s ease;
+        }
+
+        .bike-color {
+            fill: #333333;
+            transition: fill 0.5s ease;
+        }
+
+        /* Customization Section */
+        .customization-section {
+            padding: 16px;
+            overflow-y: auto;
+            height: 418px;
+            animation: fadeIn 0.6s ease-out 0.8s both;
+        }
+
+        @keyframes fadeIn {
+            from { opacity:0; }
+            to { opacity:1; }
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 12px;
+            animation: slideInLeft 0.5s ease-out both;
+        }
+
+        .section-title:nth-of-type(2) { animation-delay: 0.9s; }
+        .section-title:nth-of-type(3) { animation-delay: 1.0s; }
+        .section-title:nth-of-type(4) { animation-delay: 1.1s; }
+
+        @keyframes slideInLeft {
+            from { opacity:0; transform: translateX(-20px); }
+            to { opacity:1; transform: translateX(0); }
+        }
+
+        /* Option Grid */
+        .option-grid {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            animation: gridSlide 0.6s ease-out both;
+        }
+
+        .option-grid:nth-of-type(2) { animation-delay: 1.0s; }
+        .option-grid:nth-of-type(3) { animation-delay: 1.1s; }
+        .option-grid:nth-of-type(4) { animation-delay: 1.2s; }
+
+        @keyframes gridSlide {
+            from { opacity:0; transform: translateY(20px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        .option-item {
+            min-width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            border: 2px solid #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width:0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(25, 118, 210, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .option-item:active::before {
+            width: 100px;
+            height: 100px;
+            opacity:0;
+        }
+
+        .option-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .option-item.selected {
+            border-color: #1976D2;
+            background: #E3F2FD;
+            animation: selectPulse 0.3s ease-out;
+        }
+
+        @keyframes selectPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .option-item:active {
+            transform: scale(0.95);
+        }
+
+        .option-icon {
+            font-size: 32px;
+            margin-bottom: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .option-item:hover .option-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .option-label {
+            font-size: 10px;
+            color: #666666;
+            transition: color 0.3s ease;
+        }
+
+        .option-item.selected .option-label {
+            color: #1976D2;
+            font-weight: 600;
+        }
+
+        /* Color Picker */
+        .color-picker {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            animation: gridSlide 0.6s ease-out 1.2s both;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #1976D2;
+            animation: colorPulse 0.5s ease-out;
+        }
+
+        @keyframes colorPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .color-option:active {
+            transform: scale(0.9);
+        }
+
+        /* Stats Preview */
+        .stats-preview {
+            background: #F5F5F5;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 16px;
+            animation: fadeInUp 0.6s ease-out 1.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity:0; transform: translateY(20px); }
+            to { opacity:1; transform: translateY(0); }
+        }
+
+        .stats-title {
+            font-size: 12px;
+            color: #666666;
+            margin-bottom: 8px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-row:hover {
+            padding-left: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .stat-value {
+            font-size: 12px;
+            color: #1976D2;
+            font-weight: 500;
+            transition: all 0.5s ease;
+        }
+
+        .stat-value.updating {
+            animation: valueUpdate 0.5s ease-out;
+        }
+
+        @keyframes valueUpdate {
+            0% { transform: scale(1); color: #1976D2; }
+            50% { transform: scale(1.2); color: #4CAF50; }
+            100% { transform: scale(1); color: #1976D2; }
+        }
+
+        /* Toast通知 */
+        .toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            z-index: 2000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Save confirmation */
+        .save-confirmation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 24px 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 3000;
+            text-align: center;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .save-confirmation.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .confirmation-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: iconBounce 0.6s ease-out;
+        }
+
+        @keyframes iconBounce {
+            0% { transform: scale(0) rotate(-180deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .confirmation-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <span class="back-btn" onclick="goBack()">←</span>
+            <span class="page-title">角色定制</span>
+            <span class="save-btn" onclick="saveCustomation()">保存</span>
+        </div>
+
+        <!-- Character Preview -->
+        <div class="character-preview">
+            <svg class="character-svg" viewBox="0 0 200 280" id="character-svg">
+                <!-- Bike -->
+                <circle cx="60" cy="240" r="20" class="wheel" id="back-wheel"/>
+                <circle cx="140" cy="240" r="20" class="wheel" id="front-wheel"/>
+                <line x1="60" y1="240" x2="140" y2="240" class="bike-frame"/>
+                <line x1="100" y1="200" x2="100" y2="240" class="bike-frame"/>
+                <line x1="100" y1="200" x2="60" y2="240" class="bike-frame"/>
+                <line x1="100" y1="200" x2="140" y2="240" class="bike-frame"/>
+                <polygon points="85,200 115,200 105,180 95,180" class="bike-color" id="bike-frame-color"/>
+
+                <!-- Rider -->
+                <circle cx="100" cy="160" r="16" class="rider-head"/>
+                <path d="M 92 156 Q 100 148 108 156" class="helmet" id="helmet-color"/>
+                <rect x="94" y="176" width="12" height="24" class="rider-body" id="jersey-color"/>
+                <line x1="94" y1="190" x2="80" y2="210" class="rider-body" id="jersey-color2"/>
+                <line x1="106" y1="190" x2="120" y2="210" class="rider-body" id="jersey-color3"/>
+            </svg>
+        </div>
+
+        <!-- Customization Options -->
+        <div class="customization-section">
+            <div class="section-title">🪖 头盔颜色</div>
+            <div class="option-grid" id="helmet-options">
+                <div class="option-item" onclick="selectOption('helmet', 'red', this)">
+                    <div class="option-icon">🔴</div>
+                    <div class="option-label">红色</div>
+                </div>
+                <div class="option-item selected" onclick="selectOption('helmet', 'blue', this)">
+                    <div class="option-icon">🔵</div>
+                    <div class="option-label">蓝色</div>
+                </div>
+                <div class="option-item" onclick="selectOption('helmet', 'black', this)">
+                    <div class="option-icon">⚫</div>
+                    <div class="option-label">黑色</div>
+                </div>
+                <div class="option-item" onclick="selectOption('helmet', 'white', this)">
+                    <div class="option-icon">⚪</div>
+                    <div class="option-label">白色</div>
+                </div>
+            </div>
+
+            <div class="section-title">👕 骑行服颜色</div>
+            <div class="option-grid" id="jersey-options">
+                <div class="option-item selected" onclick="selectOption('jersey', 'blue', this)">
+                    <div class="option-icon">👕</div>
+                    <div class="option-label">蓝色</div>
+                </div>
+                <div class="option-item" onclick="selectOption('jersey', 'red', this)">
+                    <div class="option-icon">👕</div>
+                    <div class="option-label">红色</div>
+                </div>
+                <div class="option-item" onclick="selectOption('jersey', 'green', this)">
+                    <div class="option-icon">👕</div>
+                    <div class="option-label">绿色</div>
+                </div>
+                <div class="option-item" onclick="selectOption('jersey', 'orange', this)">
+                    <div class="option-icon">👕</div>
+                    <div class="option-label">橙色</div>
+                </div>
+            </div>
+
+            <div class="section-title">🚲 自行车颜色</div>
+            <div class="color-picker" id="bike-colors">
+                <div class="color-option selected" style="background: #333333;" onclick="selectBikeColor('#333333', this)"></div>
+                <div class="color-option" style="background: #FF6B35;" onclick="selectBikeColor('#FF6B35', this)"></div>
+                <div class="color-option" style="background: #1976D2;" onclick="selectBikeColor('#1976D2', this)"></div>
+                <div class="color-option" style="background: #4CAF50;" onclick="selectBikeColor('#4CAF50', this)"></div>
+                <div class="color-option" style="background: #FFD700;" onclick="selectBikeColor('#FFD700', this)"></div>
+            </div>
+
+            <div class="stats-preview">
+                <div class="stats-title">📊 装备属性预览</div>
+                <div class="stat-row">
+                    <span class="stat-label">速度</span>
+                    <span class="stat-value" id="speed-stat">+15</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">防御</span>
+                    <span class="stat-value" id="defense-stat">+20</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">魅力</span>
+                    <span class="stat-value" id="charm-stat">+10</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Save Confirmation -->
+    <div class="overlay" id="overlay"></div>
+    <div class="save-confirmation" id="save-confirmation">
+        <div class="confirmation-icon">✅</div>
+        <div class="confirmation-text">保存成功！</div>
+    </div>
+
+    <script>
+        const colors = {
+            'red': '#C62828',
+            'blue': '#1976D2',
+            'black': '#333333',
+            'white': '#EEEEEE',
+            'green': '#4CAF50',
+            'orange': '#FF6B35'
+        };
+
+        // Select option
+        function selectOption(type, color, element) {
+            // Remove selected from siblings
+            element.parentElement.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Update SVG
+            if (type === 'helmet') {
+                document.getElementById('helmet-color').style.fill = colors[color];
+            } else if (type === 'jersey') {
+                document.getElementById('jersey-color').style.fill = colors[color];
+                document.getElementById('jersey-color2').style.fill = colors[color];
+                document.getElementById('jersey-color3').style.fill = colors[color];
+            }
+
+            // Create click effect
+            createClickEffect(event);
+
+            // Show toast
+            const colorNames = {
+                'red': '红色',
+                'blue': '蓝色',
+                'black': '黑色',
+                'white': '白色',
+                'green': '绿色',
+                'orange': '橙色'
+            };
+            const typeNames = {
+                'helmet': '头盔',
+                'jersey': '骑行服'
+            };
+            showToast(`已选择${colorNames[color]}${typeNames[type]}`);
+        }
+
+        // Select bike color
+        function selectBikeColor(color, element) {
+            // Remove selected from siblings
+            element.parentElement.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Update SVG
+            document.getElementById('bike-frame-color').style.fill = color;
+
+            // Animate stats
+            ['speed-stat', 'defense-stat', 'charm-stat'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('updating');
+                setTimeout(() => {
+                    el.classList.remove('updating');
+                }, 500);
+            });
+
+            // Create click effect
+            createClickEffect(event);
+
+            // Show toast
+            showToast('自行车颜色已更新');
+        }
+
+        // Save customization
+        function saveCustomization() {
+            const overlay = document.getElementById('overlay');
+            const confirmation = document.getElementById('save-confirmation');
+
+            overlay.classList.add('show');
+            confirmation.classList.add('show');
+
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                confirmation.classList.remove('show');
+                showToast('角色外观已保存！');
+            }, 1500);
+        }
+
+        // Go back
+        function goBack() {
+            showToast('返回主页面...');
+            setTimeout(() => {
+                window.location.href = 'prototype_main.html';
+            }, 500);
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Create click effect
+        function createClickEffect(e) {
+            const effect = document.createElement('div');
+            effect.style.cssText = `
+                position: fixed;
+                left: ${e.clientX}px;
+                top: ${e.clientY}px;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(25, 118, 210, 0.3);
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+                animation: clickRipple 0.6s ease-out forwards;
+                z-index: 9999;
+            `;
+
+            document.body.appendChild(effect);
+
+            setTimeout(() => {
+                effect.remove();
+            }, 600);
+        }
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes clickRipple {
+                0% { width: 0; height: 0; opacity: 1; }
+                100% { width: 100px; height: 100px; opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add hover effect to character
+        const characterSvg = document.getElementById('character-svg');
+        characterSvg.addEventListener('mouseenter', function() {
+            this.style.animation = 'none';
+            setTimeout(() => {
+                this.style.animation = 'characterBounce 2s ease-in-out infinite';
+            }, 10);
+        });
+    </script>
+</body>
+</html>

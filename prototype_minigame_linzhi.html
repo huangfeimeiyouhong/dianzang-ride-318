@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>林芝 - 桃花盛开</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #FDF2F8 0%, #FCE7F3 50%, #FBCFE8 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+
+        .city-name {
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .game-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .pause-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .pause-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 140px);
+            overflow: hidden;
+        }
+
+        .blossom {
+            position: absolute;
+            font-size: 30px;
+            cursor: pointer;
+            animation: floatDown 4s linear forwards;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            transition: transform 0.2s ease;
+        }
+
+        .blossom:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes floatDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px) rotate(0deg);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .blossom-burst {
+            position: absolute;
+            pointer-events: none;
+            font-size: 20px;
+            animation: burst 0.8s ease-out forwards;
+        }
+
+        @keyframes burst {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 0;
+            font-size: 100px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .score-panel {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(236, 72, 153, 0.2);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #64748B;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #EC4899;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #EC4899;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 90px;
+            left: 20px;
+            right: 20px;
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #EC4899 0%, #F472B6 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .bottom-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #EC4899;
+            margin-bottom: 10px;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: #64748B;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, #64748B 0%, #94A3B8 100%);
+        }
+
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(236, 72, 153, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 3000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.95);
+        }
+
+        .toast.warning {
+            background: rgba(245, 158, 11, 0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div>
+            <div class="city-name">🌸 林芝</div>
+            <div class="game-title">桃花盛开 - Peach Blossoms</div>
+        </div>
+        <button class="pause-btn" onclick="togglePause()">⏸️ 暂停</button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <div class="score-panel">
+            <div class="score-item">
+                <div class="score-label">收集</div>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">连击</div>
+                <div class="score-value" id="comboValue">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">目标</div>
+                <div class="score-value" id="targetValue">30</div>
+            </div>
+        </div>
+
+        <div class="timer" id="timer">60</div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="tree" style="left: 10%;">🌸</div>
+        <div class="tree" style="right: 10%;">🌸</div>
+    </div>
+
+    <div class="bottom-controls">
+        <button class="control-btn primary-btn" onclick="togglePause()">
+            ⏸️ 暂停
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="pauseModal">
+        <div class="modal-content">
+            <div class="modal-icon">⏸️</div>
+            <div class="modal-title">游戏暂停</div>
+            <div class="modal-message">点击继续按钮回到游戏</div>
+            <button class="modal-btn" onclick="togglePause()">▶️ 继续</button>
+            <button class="modal-btn secondary" onclick="goBack()">↩️ 返回</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="resultIcon">🌸</div>
+            <div class="modal-title" id="resultTitle">收集结束</div>
+            <div class="modal-message" id="resultMessage">你收集了桃花</div>
+            <button class="modal-btn" onclick="retryGame()">🔄 重试</button>
+            <button class="modal-btn secondary" onclick="continueRiding()">🚴 继续骑行</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let gameStarted = false;
+        let gamePaused = false;
+        let score = 0;
+        let combo = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let spawnInterval;
+        let targetScore = 30;
+        let totalClicks = 0;
+        let successfulClicks = 0;
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function startGame() {
+            if (gameStarted) return;
+            gameStarted = true;
+            timerInterval = setInterval(updateTimer, 1000);
+            startSpawning();
+            showToast('🌸 开始收集桃花！', 'success');
+        }
+
+        function startSpawning() {
+            spawnInterval = setInterval(() => {
+                if (!gamePaused && gameStarted) {
+                    spawnBlossom();
+                }
+            }, 800);
+        }
+
+        function spawnBlossom() {
+            const blossom = document.createElement('div');
+            blossom.className = 'blossom';
+            blossom.textContent = ['🌸', '💮', '🏵️'][Math.floor(Math.random() * 3)];
+            blossom.style.left = (Math.random() * 80 + 10) + '%';
+            blossom.style.top = '-50px';
+            
+            blossom.onclick = (e) => {
+                e.stopPropagation();
+                collectBlossom(blossom);
+            };
+
+            document.getElementById('gameArea').appendChild(blossom);
+
+            setTimeout(() => {
+                if (blossom.parentNode) {
+                    blossom.remove();
+                }
+            }, 4000);
+        }
+
+        function collectBlossom(blossom) {
+            if (gamePaused) return;
+
+            totalClicks++;
+            successfulClicks++;
+            score++;
+            combo++;
+            
+            document.getElementById('scoreValue').textContent = score;
+            document.getElementById('comboValue').textContent = combo;
+
+            // Progress
+            const progress = (score / targetScore) * 100;
+            document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+
+            // Burst effect
+            createBurstEffect(blossom.offsetLeft, blossom.offsetTop);
+
+            // Remove blossom
+            blossom.remove();
+
+            // Combo notifications
+            if (combo === 5) {
+                showToast('🔥 5连击！', 'success');
+            } else if (combo === 10) {
+                showToast('🌟 10连击！太厉害了！', 'success');
+            }
+
+            // Check win condition
+            if (score >= targetScore) {
+                endGame(true);
+            }
+        }
+
+        function createBurstEffect(x, y) {
+            const gameArea = document.getElementById('gameArea');
+            const particles = ['✨', '💖', '🌸', '⭐'];
+            
+            for (let i = 0; i < 6; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'blossom-burst';
+                particle.textContent = particles[Math.floor(Math.random() * particles.length)];
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px');
+                particle.style.setProperty('--ty', (Math.random() * 100 - 50) + 'px');
+                gameArea.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
+        }
+
+        function updateTimer() {
+            if (gamePaused) return;
+            
+            timeLeft--;
+            document.getElementById('timer').textContent = timeLeft;
+
+            if (timeLeft <= 10) {
+                document.getElementById('timer').style.color = '#DC2626';
+                document.getElementById('timer').style.animation = 'pulse 0.5s ease-in-out';
+            }
+
+            if (timeLeft <= 0) {
+                endGame(false);
+            }
+        }
+
+        function endGame(timeUp) {
+            clearInterval(timerInterval);
+            clearInterval(spawnInterval);
+            gameStarted = false;
+
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+
+            if (score >= targetScore) {
+                icon.textContent = '🎉';
+                title.textContent = '恭喜完成！';
+                message.textContent = `你成功收集了 ${score} 朵桃花！\n连击最高: ${combo}\n太棒了！`;
+            } else if (timeUp) {
+                icon.textContent = '⏰';
+                title.textContent = '时间到！';
+                message.textContent = `时间结束！\n你收集了 ${score}/${targetScore} 朵桃花\n继续加油！`;
+            } else {
+                icon.textContent = '🌸';
+                title.textContent = '游戏结束';
+                message.textContent = `你收集了 ${score} 朵桃花`;
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function togglePause() {
+            gamePaused = !gamePaused;
+            const modal = document.getElementById('pauseModal');
+            const btn = document.querySelector('.pause-btn');
+
+            if (gamePaused) {
+                modal.style.display = 'flex';
+                btn.textContent = '▶️ 继续';
+            } else {
+                modal.style.display = 'none';
+                btn.textContent = '⏸️ 暂停';
+            }
+        }
+
+        function retryGame() {
+            location.reload();
+        }
+
+        function continueRiding() {
+            showToast('🚴 继续骑行...', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Touch/click to start
+        document.getElementById('gameArea').addEventListener('click', (e) => {
+            if (!gameStarted) {
+                startGame();
+            }
+        });
+
+        // Auto-start hint
+        setTimeout(() => {
+            if (!gameStarted) {
+                showToast('👆 点击屏幕开始收集桃花', 'info');
+            }
+        }, 500);
+    </script>
+</body>
+</html>

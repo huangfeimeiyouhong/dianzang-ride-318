@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>巴塘 - 弦子舞</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .city-name {
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .game-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .pause-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .pause-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 140px);
+            overflow: hidden;
+        }
+
+        .dance-floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: radial-gradient(ellipse at center, #1E3A5F 0%, #0F172A 100%);
+            border-top: 4px solid #FCD34D;
+        }
+
+        .dancer {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 80px;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+
+        .rhythm-arrow {
+            position: absolute;
+            font-size: 50px;
+            animation: slideDown 2s linear forwards;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        @keyframes slideDown {
+            0% {
+                top: -100px;
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                top: 400px;
+                opacity: 0;
+            }
+        }
+
+        .target-zone {
+            position: absolute;
+            bottom: 250px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            border: 4px solid #FCD34D;
+            border-radius: 60px;
+            background: rgba(252, 211, 77, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .score-panel {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(30, 64, 175, 0.2);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #64748B;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1E40AF;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1E40AF;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+
+        .combo-display {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            font-weight: bold;
+            color: #FCD34D;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .combo-display.show {
+            opacity: 1;
+            animation: comboPulse 0.5s ease;
+        }
+
+        @keyframes comboPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.3); }
+        }
+
+        .bottom-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .direction-btn {
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+        }
+
+        .direction-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .direction-btn:active {
+            transform: translateY(0);
+            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1E40AF;
+            margin-bottom: 10px;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: #64748B;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, #64748B 0%, #94A3B8 100%);
+        }
+
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(30, 64, 175, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 3000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.95);
+        }
+
+        .toast.warning {
+            background: rgba(245, 158, 11, 0.95);
+        }
+
+        .perfect-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            animation: perfectAnim 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 200;
+        }
+
+        @keyframes perfectAnim {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(2);
+            }
+        }
+
+        .rhythm-line {
+            position: absolute;
+            bottom: 240px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent 0%, #FCD34D 50%, transparent 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div>
+            <div class="city-name">💃 巴塘</div>
+            <div class="game-title">弦子舞 - Xianzi Dance</div>
+        </div>
+        <button class="pause-btn" onclick="togglePause()">⏸️ 暂停</button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <div class="score-panel">
+            <div class="score-item">
+                <div class="score-label">分数</div>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">连击</div>
+                <div class="score-value" id="comboValue">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">准确率</div>
+                <div class="score-value" id="accuracyValue">100%</div>
+            </div>
+        </div>
+
+        <div class="timer" id="timer">60</div>
+
+        <div class="combo-display" id="comboDisplay"></div>
+
+        <div class="rhythm-line"></div>
+        <div class="target-zone">🎯</div>
+        <div class="dancer" id="dancer">💃</div>
+        <div class="dance-floor"></div>
+    </div>
+
+    <div class="bottom-controls">
+        <button class="control-btn direction-btn" ontouchstart="handleDirection('⬆️')" onclick="handleDirection('⬆️')">
+            ⬆️
+        </button>
+        <button class="control-btn direction-btn" ontouchstart="handleDirection('⬇️')" onclick="handleDirection('⬇️')">
+            ⬇️
+        </button>
+        <button class="control-btn direction-btn" ontouchstart="handleDirection('⬅️')" onclick="handleDirection('⬅️')">
+            ⬅️
+        </button>
+        <button class="control-btn direction-btn" ontouchstart="handleDirection('➡️')" onclick="handleDirection('➡️')">
+            ➡️
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="pauseModal">
+        <div class="modal-content">
+            <div class="modal-icon">⏸️</div>
+            <div class="modal-title">游戏暂停</div>
+            <div class="modal-message">点击继续按钮回到游戏</div>
+            <button class="modal-btn" onclick="togglePause()">▶️ 继续</button>
+            <button class="modal-btn secondary" onclick="goBack()">↩️ 返回</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="resultIcon">🎉</div>
+            <div class="modal-title" id="resultTitle">舞蹈结束</div>
+            <div class="modal-message" id="resultMessage">你完成了弦子舞！</div>
+            <button class="modal-btn" onclick="retryGame()">🔄 重试</button>
+            <button class="modal-btn secondary" onclick="continueRiding()">🚴 继续骑行</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let gameStarted = false;
+        let gamePaused = false;
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let combo = 0;
+        let maxCombo = 0;
+        let totalArrows = 0;
+        let perfectHits = 0;
+        
+        let currentArrows = [];
+        let arrowSpeed = 2; // seconds
+        let spawnInterval;
+
+        const directions = ['⬆️', '⬇️', '⬅️', '➡️'];
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function startGame() {
+            if (gameStarted) return;
+            gameStarted = true;
+            timerInterval = setInterval(updateTimer, 1000);
+            startSpawningArrows();
+            showToast('💃 开始跳舞！跟随节奏点击方向键', 'success');
+        }
+
+        function startSpawningArrows() {
+            spawnInterval = setInterval(() => {
+                if (!gamePaused) {
+                    spawnArrow();
+                }
+            }, 1500);
+        }
+
+        function spawnArrow() {
+            const arrow = document.createElement('div');
+            arrow.className = 'rhythm-arrow';
+            arrow.textContent = directions[Math.floor(Math.random() * directions.length)];
+            arrow.style.left = (Math.random() * 70 + 15) + '%';
+            arrow.dataset.direction = arrow.textContent;
+            arrow.dataset.spawnTime = Date.now();
+            
+            document.getElementById('gameArea').appendChild(arrow);
+            
+            setTimeout(() => {
+                if (arrow.parentNode) {
+                    arrow.remove();
+                    if (!gamePaused) {
+                        missArrow();
+                    }
+                }
+            }, arrowSpeed * 1000);
+        }
+
+        function handleDirection(dir) {
+            if (!gameStarted) {
+                startGame();
+                return;
+            }
+
+            if (gamePaused) return;
+
+            // Find closest arrow
+            const arrows = document.querySelectorAll('.rhythm-arrow');
+            let closestArrow = null;
+            let closestDist = Infinity;
+
+            arrows.forEach(arrow => {
+                const rect = arrow.getBoundingClientRect();
+                const targetRect = document.querySelector('.target-zone').getBoundingClientRect();
+                const dist = Math.abs(rect.top - targetRect.top);
+                
+                if (dist < closestDist && dist < 150) {
+                    closestDist = dist;
+                    closestArrow = arrow;
+                }
+            });
+
+            if (closestArrow && closestArrow.dataset.direction === dir) {
+                const reactionTime = Date.now() - parseInt(closestArrow.dataset.spawnTime);
+                hitArrow(closestArrow, reactionTime);
+            } else {
+                wrongDirection();
+            }
+        }
+
+        function hitArrow(arrow, reactionTime) {
+            totalArrows++;
+            
+            let points = 100;
+            let hitType = 'Good';
+            
+            if (reactionTime < 800) {
+                points = 300;
+                hitType = 'Perfect!';
+                perfectHits++;
+                showPerfectEffect();
+            } else if (reactionTime < 1200) {
+                points = 200;
+                hitType = 'Great!';
+            }
+            
+            score += points * (1 + combo * 0.1);
+            combo++;
+            if (combo > maxCombo) maxCombo = combo;
+            
+            document.getElementById('scoreValue').textContent = Math.floor(score);
+            document.getElementById('comboValue').textContent = combo;
+            
+            showCombo();
+            showToast(`${hitType} +${Math.floor(points * (1 + combo * 0.1))}`, 'success');
+            
+            arrow.remove();
+            
+            // Dancer animation
+            const dancer = document.getElementById('dancer');
+            dancer.style.transform = 'translateX(-50%) scale(1.2)';
+            setTimeout(() => {
+                dancer.style.transform = 'translateX(-50%) scale(1)';
+            }, 200);
+        }
+
+        function missArrow() {
+            combo = 0;
+            document.getElementById('comboValue').textContent = combo;
+            showToast('Miss!', 'warning');
+        }
+
+        function wrongDirection() {
+            combo = 0;
+            document.getElementById('comboValue').textContent = combo;
+            showToast('Wrong!', 'warning');
+        }
+
+        function showCombo() {
+            if (combo >= 5) {
+                const display = document.getElementById('comboDisplay');
+                display.textContent = `${combo} Combo!`;
+                display.classList.add('show');
+                setTimeout(() => display.classList.remove('show'), 1000);
+            }
+        }
+
+        function showPerfectEffect() {
+            const effect = document.createElement('div');
+            effect.className = 'perfect-effect';
+            effect.textContent = '✨';
+            document.getElementById('gameArea').appendChild(effect);
+            setTimeout(() => effect.remove(), 1000);
+        }
+
+        function updateTimer() {
+            if (gamePaused) return;
+            
+            timeLeft--;
+            document.getElementById('timer').textContent = timeLeft;
+
+            if (timeLeft <= 10) {
+                document.getElementById('timer').style.color = '#DC2626';
+            }
+
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            clearInterval(spawnInterval);
+            gameStarted = false;
+
+            const accuracy = totalArrows > 0 ? Math.round((perfectHits / totalArrows) * 100) : 0;
+
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+
+            icon.textContent = '🎉';
+            title.textContent = '舞蹈结束！';
+            message.textContent = `最终分数: ${Math.floor(score)}\n最高连击: ${maxCombo}\n完美命中: ${perfectHits}次\n准确率: ${accuracy}%`;
+
+            document.getElementById('accuracyValue').textContent = accuracy + '%';
+
+            modal.style.display = 'flex';
+        }
+
+        function togglePause() {
+            gamePaused = !gamePaused;
+            const modal = document.getElementById('pauseModal');
+            const btn = document.querySelector('.pause-btn');
+
+            if (gamePaused) {
+                modal.style.display = 'flex';
+                btn.textContent = '▶️ 继续';
+            } else {
+                modal.style.display = 'none';
+                btn.textContent = '⏸️ 暂停';
+            }
+        }
+
+        function retryGame() {
+            location.reload();
+        }
+
+        function continueRiding() {
+            showToast('🚴 继续骑行...', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (!gameStarted) {
+                startGame();
+                return;
+            }
+
+            switch(e.key) {
+                case 'ArrowUp':
+                    e.preventDefault();
+                    handleDirection('⬆️');
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    handleDirection('⬇️');
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    handleDirection('⬅️');
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    handleDirection('➡️');
+                    break;
+            }
+        });
+
+        // Auto-start hint
+        setTimeout(() => {
+            if (!gameStarted) {
+                showToast('👆 点击方向键或按方向键开始跳舞', 'info');
+            }
+        }, 500);
+    </script>
+</body>
+</html>

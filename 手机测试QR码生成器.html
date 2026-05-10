@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>滇藏骑行游戏 - 手机测试QR码</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .step-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .step-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .instruction {
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #F1F5F9;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #334155;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #64748B;
+        }
+
+        .qr-section {
+            text-align: center;
+            padding: 20px;
+        }
+
+        #qrcode {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+
+        .url-display {
+            background: #F1F5F9;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #334155;
+            text-align: center;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status.error {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .status.info {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .game-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .game-item {
+            background: #F8FAFC;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .copy-btn {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 手机测试快速设置</h1>
+            <p>3步搞定手机测试，扫QR码直接玩！</p>
+        </div>
+
+        <div class="step-box">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                <span>启动本地服务器</span>
+            </div>
+            <div class="instruction">
+                <p><strong>方法A（推荐）：</strong>双击运行 <code>启动手机测试服务器.bat</code></p>
+                <p><strong>方法B：</strong>手动启动服务器</p>
+                <div class="code-block">
+cd D:\FFOutput\滇藏骑行游戏
+python -m http.server 8080
+                </div>
+                <button class="btn" onclick="startServer()">🚀 自动启动服务器</button>
+            </div>
+            <div id="serverStatus"></div>
+        </div>
+
+        <div class="step-box">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                <span>获取访问地址</span>
+            </div>
+            <div class="instruction">
+                <p>服务器启动后，复制以下地址在手机浏览器中打开：</p>
+                <div class="url-display" id="访问地址">
+                    请先启动服务器，然后点击"获取IP地址"按钮
+                </div>
+                <button class="btn" onclick="getIPAddress()">🔍 获取IP地址</button>
+                <button class="btn btn-secondary" onclick="copyURL()">📋 复制地址</button>
+            </div>
+        </div>
+
+        <div class="step-box">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                <span>手机扫码访问</span>
+            </div>
+            <div class="qr-section">
+                <p style="margin-bottom: 15px; color: #64748B;">用手机扫描下方QR码，直接打开测试页面</p>
+                <div id="qrcode"></div>
+                <p style="margin-top: 15px; color: #64748B; font-size: 14px;">
+                    💡 如果无法扫码，请手动输入上方地址
+                </p>
+            </div>
+        </div>
+
+        <div class="step-box">
+            <div class="step-title">
+                <span class="step-number">📋</span>
+                <span>所有游戏访问地址</span>
+            </div>
+            <div class="instruction">
+                <p>手动复制以下地址到手机浏览器：</p>
+                <div class="game-list" id="gameList">
+                    <!-- Games will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let serverURL = '';
+
+        const games = [
+            { city: '上海', name: '外滩钟声', file: 'prototype_minigame_shanghai.html' },
+            { city: '苏州', name: '园林拼图', file: 'prototype_minigame_suzhou.html' },
+            { city: '南京', name: '梧桐叶落', file: 'prototype_minigame_nanjing.html' },
+            { city: '武汉', name: '黄鹤楼登高', file: 'prototype_minigame_wuhan.html' },
+            { city: '宜昌', name: '屈原投江', file: 'prototype_minigame_yichang.html' },
+            { city: '重庆', name: '轻轨穿楼', file: 'prototype_minigame_chongqing.html' },
+            { city: '成都', name: '熊猫喂食', file: 'prototype_minigame_chengdu.html' },
+            { city: '雅安', name: '茶马古道', file: 'prototype_minigame_yaan.html' },
+            { city: '康定', name: '康定情歌', file: 'prototype_minigame.html' },
+            { city: '新都桥', name: '光影捕捉', file: 'prototype_minigame_xinduqiao.html' },
+            { city: '理塘', name: '赛马节', file: 'prototype_minigame_litang.html' },
+            { city: '巴塘', name: '弦子舞', file: 'prototype_minigame_batang.html' },
+            { city: '林芝', name: '桃花盛开', file: 'prototype_minigame_linzhi.html' },
+            { city: '工布江达', name: '尼洋河漂流', file: 'prototype_minigame_gongbo.html' },
+            { city: '墨竹工卡', name: '松赞干布猜谜', file: 'prototype_minigame_maizho.html' },
+            { city: '拉萨', name: '朝圣之路', file: 'prototype_minigame_lhasa.html' }
+        ];
+
+        // Render game list
+        const gameList = document.getElementById('gameList');
+        games.forEach(game => {
+            const item = document.createElement('div');
+            item.className = 'game-item';
+            item.innerHTML = `
+                <strong>${game.city}</strong><br>
+                ${game.name}<br>
+                <small style="color: #94A3B8;">${game.file}</small>
+            `;
+            gameList.appendChild(item);
+        });
+
+        function startServer() {
+            const status = document.getElementById('serverStatus');
+            status.innerHTML = '<div class="status info">⏳ 正在启动服务器...</div>';
+            
+            // Note: Can't actually start server from browser, show instruction
+            setTimeout(() => {
+                status.innerHTML = `
+                    <div class="status success">
+                        ✅ 请手动启动服务器：<br><br>
+                        1. 双击 <code>启动手机测试服务器.bat</code><br>
+                        2. 或运行命令：<code>python -m http.server 8080</code>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        function getIPAddress() {
+            // In browser, we can't get local IP directly
+            // Show manual instruction
+            const status = document.getElementById('serverStatus');
+            status.innerHTML = `
+                <div class="status info">
+                    📝 <strong>请手动获取IP地址：</strong><br><br>
+                    1. 按 <code>Win + R</code>，输入 <code>cmd</code>，回车<br>
+                    2. 输入命令：<code>ipconfig</code><br>
+                    3. 找到"无线局域网适配器 WLAN"<br>
+                    4. 记录"IPv4 地址"（例如：192.168.1.100）<br>
+                    5. 在下方输入你的IP地址：
+                </div>
+                <input type="text" id="ipInput" placeholder="例如：192.168.1.100" style="
+                    padding: 10px;
+                    border: 2px solid #E2E8F0;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    width: 250px;
+                    margin: 10px 0;
+                ">
+                <button class="btn" onclick="generateQR()">✅ 生成QR码</button>
+            `;
+        }
+
+        function generateQR() {
+            const ip = document.getElementById('ipInput').value;
+            if (!ip) {
+                alert('请输入IP地址！');
+                return;
+            }
+
+            serverURL = `http://${ip}:8080/test_all_games_v2.html`;
+            
+            // Update URL display
+            document.getElementById('访问地址').textContent = serverURL;
+
+            // Generate QR code
+            document.getElementById('qrcode').innerHTML = '';
+            QRCode.toCanvas(document.getElementById('qrcode'), serverURL, {
+                width: 256,
+                margin: 2,
+                color: {
+                    dark: '#667eea',
+                    light: '#FFFFFF'
+                }
+            }, function (error) {
+                if (error) {
+                    console.error(error);
+                    document.getElementById('qrcode').innerHTML = '<p style="color: #EF4444;">QR码生成失败，请手动复制地址</p>';
+                }
+            });
+
+            const status = document.getElementById('serverStatus');
+            status.innerHTML = '<div class="status success">✅ QR码已生成！用手机扫描即可访问</div＞';
+        }
+
+        function copyURL() {
+            if (!serverURL) {
+                alert('请先获取IP地址并生成QR码！');
+                return;
+            }
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(serverURL).then(() => {
+                    alert('✅ 地址已复制到剪贴板！');
+                });
+            } else {
+                alert('请手动复制地址：\n\n' + serverURL);
+            }
+        }
+
+        // Auto-detect if server is running (by trying to fetch)
+        async function checkServer() {
+            try {
+                const response = await fetch('http://localhost:8080/', { mode: 'no-cors' });
+                document.getElementById('serverStatus').innerHTML = `
+                    <div class="status success">✅ 服务器已启动！</div>
+                `;
+            } catch (e) {
+                document.getElementById('serverStatus').innerHTML = `
+                    <div class="status error">⚠️ 服务器未启动，请点击"自动启动服务器"按钮</div>
+                `;
+            }
+        }
+
+        // Check server status on load
+        checkServer();
+    </script>
+</body>
+</html>

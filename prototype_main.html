@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>骑行318 - 主地图界面</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #E8F5E9 0%, #FFFFFF 100%); /* 江南段配色 */
+            overflow-x: hidden;
+            opacity: 0;
+            animation: pageLoad 0.6s ease-out 0.1s forwards;
+        }
+
+        @keyframes pageLoad {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Phone Frame */
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+            position: relative;
+            opacity: 0;
+            animation: phoneFrameLoad 0.8s ease-out 0.3s forwards;
+        }
+
+        @keyframes phoneFrameLoad {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            background: linear-gradient(135deg, #5BB5A2 0%, #4E9E8C 100%); /* 江南青 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px;
+            border-radius: 24px 24px 0 0;
+            position: relative;
+            z-index: 100;
+        }
+
+        .status-title {
+            color: #FFFFFF;
+            font-size: 17px;
+            font-weight: 600;
+            animation: titleSlide 0.5s ease-out 0.6s both;
+        }
+
+        @keyframes titleSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .energy-badge {
+            position: absolute;
+            right: 16px;
+            top: 10px;
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            color: #FFFFFF;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Map Area */
+        .map-area {
+            height: 350px;
+            background: linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%);
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .mountain-layer {
+            position: absolute;
+            width: 100%;
+            height: 200px;
+            top: 50px;
+            animation: mountainSlide 1s ease-out 0.8s both;
+        }
+
+        @keyframes mountainSlide {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mountain-far {
+            fill: #C8E6C9;
+            opacity: 0.5;
+        }
+
+        .mountain-near {
+            fill: #A5D6A7;
+            opacity: 0.7;
+        }
+
+        .road-path {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            animation: roadDraw 1.2s ease-out 1s both;
+        }
+
+        @keyframes roadDraw {
+            from { opacity: 0; stroke-dashoffset: 1000; }
+            to { opacity: 1; stroke-dashoffset: 0; }
+        }
+
+        .road-line {
+            stroke: #8D6E63;
+            stroke-width: 6;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawRoad 1.5s ease-out 1s forwards;
+        }
+
+        @keyframes drawRoad {
+            to { stroke-dashoffset: 0; }
+        }
+
+        .road-dash {
+            stroke: #FFFFFF;
+            stroke-width: 4;
+            stroke-dasharray: 10,5;
+            fill: none;
+            animation: dashMove 0.5s linear infinite;
+        }
+
+        @keyframes dashMove {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: -15; }
+        }
+
+        /* Character */
+        .character {
+            position: absolute;
+            top: 220px;
+            left: 140px;
+            width: 60px;
+            height: 80px;
+            animation: characterPedal 0.8s linear infinite, characterAppear 0.8s ease-out 1.2s both;
+        }
+
+        @keyframes characterPedal {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+        }
+
+        @keyframes characterAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bike-frame {
+            stroke: #8D6E63;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .wheel {
+            fill: #333333;
+            stroke: #666666;
+            stroke-width: 1;
+            animation: wheelRotate 1s linear infinite;
+            transform-origin: center;
+        }
+
+        @keyframes wheelRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .rider-head {
+            fill: #FFE0B2;
+        }
+
+        .rider-body {
+            fill: #1976D2;
+        }
+
+        .helmet {
+            fill: #C62828;
+        }
+
+        /* City Markers */
+        .city-marker {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            animation: markerAppear 0.5s ease-out both;
+        }
+
+        .city-marker:nth-child(1) { animation-delay: 1.5s; }
+        .city-marker:nth-child(2) { animation-delay: 1.6s; }
+        .city-marker:nth-child(3) { animation-delay: 1.7s; }
+        .city-marker:nth-child(4) { animation-delay: 1.8s; }
+
+        @keyframes markerAppear {
+            from { opacity: 0; transform: scale(0); }
+            50% { transform: scale(1.2); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .city-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+            border: 2px solid #FF6F00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        }
+
+        .city-dot:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.6);
+        }
+
+        .city-dot::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #FFD700;
+            animation: markerPulse 2s ease-out infinite;
+        }
+
+        @keyframes markerPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .city-name {
+            position: absolute;
+            top: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            white-space: nowrap;
+            color: #333333;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .city-marker:hover .city-name {
+            opacity: 1;
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            padding: 12px 16px;
+            background: #FFFFFF;
+            animation: progressSlide 0.6s ease-out 1.8s both;
+        }
+
+        @keyframes progressSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(135deg, #5BB5A2 0%, #4E9E8C 100%); /* 江南青 */
+            border-radius: 4px;
+            transition: width 1.5s ease-out 2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progressShine 2s ease-out 2s forwards;
+        }
+
+        @keyframes progressShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .progress-dot {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: #5BB5A2; /* 江南青 */
+            border: 2px solid #FFFFFF;
+            border-radius: 50%;
+            opacity: 0;
+            animation: dotAppear 0.5s ease-out 3.5s forwards;
+        }
+
+        @keyframes dotAppear {
+            from { opacity: 0; transform: translateY(-50%) scale(0); }
+            to { opacity: 1; transform: translateY(-50%) scale(1); }
+        }
+
+        /* City Info Card */
+        .city-card {
+            margin: 8px 16px;
+            padding: 16px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #5BB5A2; /* 江南青 */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            opacity: 0;
+            animation: cardSlide 0.6s ease-out 2.2s forwards;
+            transition: all 0.3s ease;
+        }
+
+        .city-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        @keyframes cardSlide {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .city-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .city-name-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #5BB5A2; /* 江南青 */
+        }
+
+        .city-distance {
+            font-size: 11px;
+            color: #666666;
+        }
+
+        .city-divider {
+            width: 100%;
+            height: 1px;
+            background: #E0E0E0;
+            margin: 8px 0;
+        }
+
+        .city-minigame {
+            font-size: 11px;
+            color: #333333;
+            margin-bottom: 4px;
+        }
+
+        .city-difficulty {
+            font-size: 11px;
+            color: #FF6F00;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            width: 120px;
+            height: 32px;
+            background: linear-gradient(135deg, #5BB5A2 0%, #4E9E8C 100%); /* 江南青 */
+            color: #FFFFFF;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(91, 181, 162, 0.4); /* 江南青阴影 */
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary:active::before {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 88px;
+            background: #FFFFFF;
+            border-top: 1px solid #E0E0E0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .nav-item:hover {
+            background: rgba(25, 118, 210, 0.05);
+        }
+
+        .nav-item:active {
+            transform: scale(0.9);
+        }
+
+        .nav-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-icon.active {
+            background: linear-gradient(135deg, #5BB5A2 0%, #4E9E8C 100%); /* 江南青 */
+            color: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(91, 181, 162, 0.4);
+        }
+
+        .nav-icon.inactive {
+            background: #E0E0E0;
+            color: #666666;
+        }
+
+        .nav-label {
+            font-size: 9px;
+            color: #666666;
+            transition: all 0.3s ease;
+        }
+
+        .nav-label.active {
+            color: #1976D2;
+            font-weight: 500;
+        }
+
+        /* HUD */
+        .hud {
+            position: absolute;
+            top: 60px;
+            left: 16px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 11px;
+            opacity: 0;
+            animation: hudSlide 0.6s ease-out 1.4s forwards;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes hudSlide {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .hud-item:hover {
+            transform: translateX(5px);
+        }
+
+        .hud-icon {
+            margin-right: 8px;
+            font-size: 12px;
+        }
+
+        .hud-value {
+            font-weight: 500;
+            color: #333333;
+        }
+
+        .hud-value.energy-pulse {
+            animation: energyPulse 1s ease-in-out;
+        }
+
+        @keyframes energyPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); color: #FF6F00; }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #42A5F5;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 3s ease-out forwards;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(0);
+            }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            z-index: 1000;
+            transition: transform 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span class="status-title">骑行318</span>
+            <div class="energy-badge" id="energy-badge">🔋 <span id="energy-value">100</span></div>
+        </div>
+
+        <!-- HUD -->
+        <div class="hud">
+            <div class="hud-item">
+                <span class="hud-icon">⚡</span>
+                <span class="hud-value">体能: <span id="stamina-value">200</span>/200</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-icon">📏</span>
+                <span class="hud-value">里程: <span id="distance-value">0</span>km</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-icon">⛰️</span>
+                <span class="hud-value">海拔: <span id="altitude-value">4</span>m</span>
+            </div>
+        </div>
+
+        <!-- Map Area -->
+        <div class="map-area" id="map-area">
+            <!-- Mountains (SVG) -->
+            <svg class="mountain-layer" viewBox="0 0 375 200">
+                <polygon points="0,200 80,100 160,150 240,100 320,200" class="mountain-far"/>
+                <polygon points="0,200 60,150 160,200" class="mountain-near"/>
+                <polygon points="220,200 280,150 375,200" class="mountain-near"/>
+            </svg>
+
+            <!-- Road -->
+            <svg class="road-path" viewBox="0 0 200 200">
+                <path d="M 100 200 Q 90 130 80 70 Q 70 40 100 0" class="road-line"/>
+                <path d="M 100 200 Q 90 130 80 70 Q 70 40 100 0" class="road-dash"/>
+            </svg>
+
+            <!-- Character -->
+            <svg class="character" viewBox="0 0 60 80">
+                <!-- Bike -->
+                <circle cx="20" cy="60" r="12" class="wheel"/>
+                <circle cx="40" cy="60" r="12" class="wheel"/>
+                <line x1="20" y1="60" x2="40" y2="60" class="bike-frame"/>
+                <line x1="30" y1="48" x2="30" y2="60" class="bike-frame"/>
+                <line x1="30" y1="48" x2="20" y2="60" class="bike-frame"/>
+                <line x1="30" y1="48" x2="40" y2="60" class="bike-frame"/>
+                <!-- Rider -->
+                <circle cx="30" cy="36" r="6" class="rider-head"/>
+                <rect x="28" y="42" width="4" height="10" class="rider-body"/>
+                <path d="M 26 32 Q 30 28 34 32" class="helmet"/>
+            </svg>
+
+            <!-- City Markers (16 cities along 318) -->
+            <div class="city-marker" style="top: 50px; left: 160px;" onclick="showCityInfo('上海人民广场')">
+                <div class="city-dot">🏙️</div>
+                <div class="city-name">上海人民广场</div>
+            </div>
+
+            <div class="city-marker" style="top: 70px; left: 180px;" onclick="showCityInfo('苏州')">
+                <div class="city-dot">🏯</div>
+                <div class="city-name">苏州</div>
+            </div>
+
+            <div class="city-marker" style="top: 90px; left: 200px;" onclick="showCityInfo('南京')">
+                <div class="city-dot">🌳</div>
+                <div class="city-name">南京</div>
+            </div>
+
+            <div class="city-marker" style="top: 120px; left: 220px;" onclick="showCityInfo('武汉')">
+                <div class="city-dot">🏢</div>
+                <div class="city-name">武汉</div>
+            </div>
+
+            <div class="city-marker" style="top: 150px; left: 200px;" onclick="showCityInfo('宜昌')">
+                <div class="city-dot">🚢</div>
+                <div class="city-name">宜昌</div>
+            </div>
+
+            <div class="city-marker" style="top: 180px; left: 240px;" onclick="showCityInfo('重庆')">
+                <div class="city-dot">🍜</div>
+                <div class="city-name">重庆</div>
+            </div>
+
+            <div class="city-marker" style="top: 210px; left: 260px;" onclick="showCityInfo('成都')">
+                <div class="city-dot">🐼</div>
+                <div class="city-name">成都</div>
+            </div>
+
+            <div class="city-marker" style="top: 240px; left: 240px;" onclick="showCityInfo('雅安')">
+                <div class="city-dot">🍵</div>
+                <div class="city-name">雅安</div>
+            </div>
+
+            <div class="city-marker" style="top: 270px; left: 260px;" onclick="showCityInfo('康定')">
+                <div class="city-dot">🎵</div>
+                <div class="city-name">康定</div>
+            </div>
+
+            <div class="city-marker" style="top: 300px; left: 240px;" onclick="showCityInfo('新都桥')">
+                <div class="city-dot">📸</div>
+                <div class="city-name">新都桥</div>
+            </div>
+
+            <div class="city-marker" style="top: 330px; left: 260px;" onclick="showCityInfo('理塘')">
+                <div class="city-dot">🏔️</div>
+                <div class="city-name">理塘</div>
+            </div>
+
+            <div class="city-marker" style="top: 360px; left: 240px;" onclick="showCityInfo('巴塘')">
+                <div class="city-dot">🎻</div>
+                <div class="city-name">巴塘</div>
+            </div>
+
+            <div class="city-marker" style="top: 390px; left: 220px;" onclick="showCityInfo('林芝')">
+                <div class="city-dot">🌸</div>
+                <div class="city-name">林芝</div>
+            </div>
+
+            <div class="city-marker" style="top: 420px; left: 240px;" onclick="showCityInfo('工布江达')">
+                <div class="city-dot">🚣</div>
+                <div class="city-name">工布江达</div>
+            </div>
+
+            <div class="city-marker" style="top: 450px; left: 220px;" onclick="showCityInfo('墨竹工卡')">
+                <div class="city-dot">📝</div>
+                <div class="city-name">墨竹工卡</div>
+            </div>
+
+            <div class="city-marker" style="top: 480px; left: 240px;" onclick="showCityInfo('拉萨布达拉宫')">
+                <div class="city-dot">🏆</div>
+                <div class="city-name">拉萨布达拉宫</div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section" style="position: relative;">
+            <div class="progress-label">
+                <span>已骑行 <span id="distance-traveled">2500</span>km / 5000km</span>
+                <span id="progress-percent">50%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-dot"></div>
+        </div>
+
+        <!-- City Info Card -->
+        <div class="city-card" id="city-card">
+            <div class="city-header">
+                <span class="city-name-title" id="city-name">🏙️ 上海人民广场</span>
+                <span class="city-distance" id="city-distance">0km | 4m</span>
+            </div>
+            <div class="city-divider"></div>
+            <div class="city-minigame" id="city-minigame">🏙️ 特色小游戏：外滩钟声</div>
+            <div class="city-difficulty" id="city-difficulty">⭐ 难度：简单</div>
+            <button class="btn-primary" id="minigame-btn" onclick="startMinigame()">开始小游戏</button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item" onclick="navigateTo(this, 'map')">
+                <div class="nav-icon active" id="nav-map">🗺️</div>
+                <span class="nav-label active" id="label-map">地图</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo(this, 'backpack')">
+                <div class="nav-icon inactive" id="nav-backpack">🎒</div>
+                <span class="nav-label" id="label-backpack">背包</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo(this, 'social')">
+                <div class="nav-icon inactive" id="nav-social">👥</div>
+                <span class="nav-label" id="label-social">社交</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo(this, 'profile')">
+                <div class="nav-icon inactive" id="nav-profile">👤</div>
+                <span class="nav-label" id="label-profile">我的</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Initialize progress bar animation
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('progress-fill').style.width = '50%';
+            }, 100);
+        });
+
+        // Navigation
+        function navigateTo(element, page) {
+            // Reset all nav items
+            document.querySelectorAll('.nav-icon').forEach(icon => {
+                icon.classList.remove('active');
+                icon.classList.add('inactive');
+            });
+            document.querySelectorAll('.nav-label').forEach(label => {
+                label.classList.remove('active');
+            });
+
+            // Activate clicked item
+            document.getElementById('nav-' + page).classList.remove('inactive');
+            document.getElementById('nav-' + page).classList.add('active');
+            document.getElementById('label-' + page).classList.add('active');
+
+            // Show toast notification
+            showToast('切换到' + getPageName(page) + '页面');
+
+            // Simulate page navigation
+            setTimeout(() => {
+                switch(page) {
+                    case 'backpack':
+                        window.location.href = 'prototype_backpack.html';
+                        break;
+                    case 'social':
+                        window.location.href = 'prototype_social.html';
+                        break;
+                    case 'profile':
+                        window.location.href = 'prototype_profile.html';
+                        break;
+                }
+            }, 500);
+        }
+
+        function getPageName(page) {
+            const names = {
+                'map': '地图',
+                'backpack': '背包',
+                'social': '社交',
+                'profile': '我的'
+            };
+            return names[page];
+        }
+
+        // Show city info
+        function showCityInfo(city) {
+            const cityData = {
+                '上海人民广场': { icon: '🏙️', distance: '0km | 4m', minigame: '🏙️ 特色小游戏：外滩钟声', difficulty: '⭐ 难度：简单' },
+                '苏州': { icon: '🏯', distance: '85km | 5m', minigame: '🏯 特色小游戏：园林拼图', difficulty: '⭐⭐ 难度：中等' },
+                '南京': { icon: '🌳', distance: '300km | 9m', minigame: '🌳 特色小游戏：梧桐叶落', difficulty: '⭐⭐ 难度：中等' },
+                '武汉': { icon: '🏢', distance: '830km | 23m', minigame: '🏢 特色小游戏：黄鹤楼登高', difficulty: '⭐⭐⭐ 难度：较高' },
+                '宜昌': { icon: '🚢', distance: '1100km | 58m', minigame: '🚢 特色小游戏：屈原投江', difficulty: '⭐⭐⭐ 难度：较高' },
+                '重庆': { icon: '🍜', distance: '1480km | 243m', minigame: '🍜 特色小游戏：轻轨穿楼', difficulty: '⭐⭐⭐ 难度：较高' },
+                '成都': { icon: '🐼', distance: '1950km | 500m', minigame: '🐼 特色小游戏：熊猫喂食', difficulty: '⭐ 难度：简单' },
+                '雅安': { icon: '🍵', distance: '2130km | 580m', minigame: '🍵 特色小游戏：茶马古道', difficulty: '⭐⭐⭐ 难度：较高' },
+                '康定': { icon: '🎵', distance: '2330km | 2560m', minigame: '🎵 特色小游戏：康定情歌', difficulty: '⭐⭐⭐⭐ 难度：高' },
+                '新都桥': { icon: '📸', distance: '2480km | 3300m', minigame: '📸 特色小游戏：光影捕捉', difficulty: '⭐⭐⭐ 难度：较高' },
+                '理塘': { icon: '🏔️', distance: '2680km | 4014m', minigame: '🏔️ 特色小游戏：赛马节', difficulty: '⭐⭐⭐ 难度：较高' },
+                '巴塘': { icon: '🎻', distance: '2830km | 2580m', minigame: '🎻 特色小游戏：弦子舞', difficulty: '⭐⭐⭐⭐ 难度：高' },
+                '林芝': { icon: '🌸', distance: '3830km | 2990m', minigame: '🌸 特色小游戏：桃花盛开', difficulty: '⭐ 难度：简单' },
+                '工布江达': { icon: '🚣', distance: '4030km | 3420m', minigame: '🚣 特色小游戏：尼洋河漂流', difficulty: '⭐⭐⭐⭐ 难度：高' },
+                '墨竹工卡': { icon: '📝', distance: '4830km | 3800m', minigame: '📝 特色小游戏：松赞干布猜谜', difficulty: '⭐⭐⭐ 难度：较高' },
+                '拉萨布达拉宫': { icon: '🏆', distance: '5000km | 3650m', minigame: '🏆 特色小游戏：朝圣之路（终点）', difficulty: '⭐⭐⭐⭐⭐ 难度：终极' }
+            };
+
+            const data = cityData[city];
+            document.getElementById('city-name').textContent = data.icon + ' ' + city;
+            document.getElementById('city-distance').textContent = data.distance;
+            document.getElementById('city-minigame').textContent = data.minigame;
+            document.getElementById('city-difficulty').textContent = data.difficulty;
+
+            // Animate card
+            const card = document.getElementById('city-card');
+            card.style.animation = 'none';
+            setTimeout(() => {
+                card.style.animation = 'cardSlide 0.6s ease-out forwards';
+            }, 10);
+
+            // Create particles
+            createParticles(event);
+        }
+
+        // Start minigame
+        function startMinigame() {
+            const btn = document.getElementById('minigame-btn');
+            const cityName = document.getElementById('city-name').textContent.split(' ')[1]; // Extract city name
+            btn.textContent = '加载中...';
+            btn.disabled = true;
+
+            let minigamePage = '';
+            let minigameName = '';
+
+            // Map city to minigame page
+            if (cityName.includes('康定')) {
+                minigamePage = 'prototype_minigame.html';
+                minigameName = '康定情歌';
+            } else if (cityName.includes('成都')) {
+                minigamePage = 'prototype_minigame_chengdu.html';
+                minigameName = '熊猫喂食';
+            } else if (cityName.includes('拉萨')) {
+                minigamePage = 'prototype_minigame_lhasa.html';
+                minigameName = '朝圣之路';
+            } else {
+                // Other cities - show toast for now
+                setTimeout(() => {
+                    showToast('🎮 ' + cityName + ' 小游戏开发中...');
+                    btn.textContent = '开始小游戏';
+                    btn.disabled = false;
+                }, 800);
+                return;
+            }
+
+            setTimeout(() => {
+                showToast('🎵 开始' + minigameName + '小游戏！');
+                btn.textContent = '开始小游戏';
+                btn.disabled = false;
+
+                // Simulate navigation to minigame
+                setTimeout(() => {
+                    window.location.href = minigamePage;
+                }, 1000);
+            }, 800);
+        }
+
+        // Create floating particles
+        function createParticles(event) {
+            const mapArea = document.getElementById('map-area');
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = (event ? event.clientX : Math.random() * 375) + 'px';
+                particle.style.top = (event ? event.clientY : Math.random() * 350) + 'px';
+                particle.style.background = ['#42A5F5', '#1976D2', '#FFD700', '#4CAF50'][Math.floor(Math.random() * 4)];
+
+                mapArea.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 3000);
+            }
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Simulate energy/stamina changes
+        setInterval(() => {
+            const stamina = document.getElementById('stamina-value');
+            const current = parseInt(stamina.textContent);
+            const change = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+            const newVal = Math.max(0, Math.min(200, current + change));
+            stamina.textContent = newVal;
+
+            if (change !== 0) {
+                stamina.classList.add('energy-pulse');
+                setTimeout(() => {
+                    stamina.classList.remove('energy-pulse');
+                }, 1000);
+            }
+        }, 3000);
+
+        // Add click sounds effect (visual feedback)
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-primary') || e.target.closest('.nav-item')) {
+                createClickEffect(e.clientX, e.clientY);
+            }
+        });
+
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.style.cssText = `
+                position: fixed;
+                left: ${x}px;
+                top: ${y}px;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(25, 118, 210, 0.3);
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+                animation: clickRipple 0.6s ease-out forwards;
+            `;
+
+            document.body.appendChild(effect);
+
+            setTimeout(() => {
+                effect.remove();
+            }, 600);
+        }
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes clickRipple {
+                0% { width: 0; height: 0; opacity: 1; }
+                100% { width: 100px; height: 100px; opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

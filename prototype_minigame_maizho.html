@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>墨竹工卡 - 松赞干布猜谜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .city-name {
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .game-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .pause-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .pause-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 140px);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(30, 64, 175, 0.15);
+        }
+
+        .question-number {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1E293B;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: #F1F5F9;
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            background: #E2E8F0;
+            transform: translateX(5px);
+        }
+
+        .option-btn.correct {
+            background: #D1FAE5;
+            border-color: #10B981;
+            color: #065F46;
+        }
+
+        .option-btn.wrong {
+            background: #FEE2E2;
+            border-color: #EF4444;
+            color: #991B1B;
+        }
+
+        .option-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .score-panel {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(30, 64, 175, 0.2);
+            display: flex;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: #64748B;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .score-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1E40AF;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1E40AF;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 90px;
+            left: 20px;
+            right: 20px;
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FCD34D 0%, #F59E0B 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .hint-area {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #92400E;
+            display: none;
+        }
+
+        .hint-area.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bottom-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1E40AF;
+            margin-bottom: 10px;
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: #64748B;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, #64748B 0%, #94A3B8 100%);
+        }
+
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(30, 64, 175, 0.95);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 3000;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.95);
+        }
+
+        .toast.warning {
+            background: rgba(245, 158, 11, 0.95);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div>
+            <div class="city-name>🏯 墨竹工卡</div>
+            <div class="game-title">松赞干布猜谜 - Songtsen Gampo Quiz</div>
+        </div>
+        <button class="pause-btn" onclick="togglePause()">⏸️ 暂停</button>
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <div class="score-panel">
+            <div class="score-item">
+                <div class="score-label">得分</div>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">正确</div>
+                <div class="score-value" id="correctValue">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">进度</div>
+                <div class="score-value" id="progressValue">1/10</div>
+            </div>
+        </div>
+
+        <div class="timer" id="timer">60</div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="quiz-container" id="quizContainer">
+            <div class="question-number" id="questionNumber">问题 1/10</div>
+            <div class="question-text" id="questionText">问题加载中...</div>
+            <div class="options-container" id="optionsContainer">
+                <button class="option-btn" onclick="selectOption(0)">选项 A</button>
+                <button class="option-btn" onclick="selectOption(1)">选项 B</button>
+                <button class="option-btn" onclick="selectOption(2)">选项 C</button>
+                <button class="option-btn" onclick="selectOption(3)">选项 D</button>
+            </div>
+            <div class="hint-area" id="hintArea"></div>
+        </div>
+    </div>
+
+    <div class="bottom-controls">
+        <button class="control-btn primary-btn" onclick="showHint()">
+            💡 提示
+        </button>
+        <button class="control-btn primary-btn" onclick="skipQuestion()">
+            ⏭️ 跳过
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="pauseModal">
+        <div class="modal-content">
+            <div class="modal-icon">⏸️</div>
+            <div class="modal-title">游戏暂停</div>
+            <div class="modal-message">点击继续按钮回到游戏</div>
+            <button class="modal-btn" onclick="togglePause()">▶️ 继续</button>
+            <button class="modal-btn secondary" onclick="goBack()">↩️ 返回</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="resultIcon">🏆</div>
+            <div class="modal-title" id="resultTitle">猜谜结束</div>
+            <div class="modal-message" id="resultMessage">你完成了猜谜</div>
+            <button class="modal-btn" onclick="retryGame()">🔄 重试</button>
+            <button class="modal-btn secondary" onclick="continueRiding()">🚴 继续骑行</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let gameStarted = false;
+        let gamePaused = false;
+        let score = 0;
+        let timeLeft = 60;
+        let timerInterval;
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        let totalQuestions = 10;
+        let questionAnswered = false;
+        let usedHint = false;
+
+        const questions = [
+            {
+                question: "松赞干布是下列哪个王朝的赞普？",
+                options: ["吐蕃王朝", "唐朝", "元朝", "清朝"],
+                correct: 0,
+                hint: "这是西藏历史上第一个统一的王朝"
+            },
+            {
+                question: "松赞干布迎娶了哪位唐朝公主？",
+                options: ["武则天", "文成公主", "太平公主", "安乐公主"],
+                correct: 1,
+                hint: "她的名字与'文化'的'文'字相同"
+            },
+            {
+                question: "松赞干布为了迎接文成公主而修建的宫殿是？",
+                options: ["故宫", "布达拉宫", "大昭寺", "小昭寺"],
+                correct: 1,
+                hint: "这座宫殿位于拉萨的红山上"
+            },
+            {
+                question: "松赞干布时期创制了什么文字？",
+                options: ["汉字", "藏文", "梵文", "蒙古文"],
+                correct: 1,
+                hint: "这种文字至今仍在使用"
+            },
+            {
+                question: "松赞干布派往印度学习佛法和文字的大臣是？",
+                options: ["禄东赞", "吞弥·桑布扎", "噶尔·东赞", "韦·囊热苏赞"],
+                correct: 1,
+                hint: "他的名字与'桑布'（善良）有关"
+            },
+            {
+                question: "松赞干布统一西藏后，定都在哪里？",
+                options: ["西安", "拉萨", "西宁", "成都"],
+                correct: 1,
+                hint: "这座城市被称为'日光城'"
+            },
+            {
+                question: "松赞干布是吐蕃的第几代赞普？",
+                options: ["第20代", "第25代", "第30代", "第33代"],
+                correct: 3,
+                hint: "这个数字在佛教中有特殊意义"
+            },
+            {
+                question: "松赞干布推行什么制度来巩固统治？",
+                options: ["科举制", "法律制度", "均田制", "郡县制"],
+                correct: 1,
+                hint: "他制定了吐蕃的法律体系"
+            },
+            {
+                question: "文成公主进藏时，带去了什么重要的东西？",
+                options: ["茶叶和丝绸", "佛经和佛像", "工具和种子", "以上都是"],
+                correct: 3,
+                hint: "她对西藏的文化和经济发展做出了全面贡献"
+            },
+            {
+                question: "松赞干布去世后，他的形象常被描绘成什么样子？",
+                options: ["武士形象", "观音菩萨形象", "文殊菩萨形象", "普贤菩萨形象"],
+                correct: 1,
+                hint: "在藏传佛教中，他被视为观音的化身"
+            }
+        ];
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function startGame() {
+            if (gameStarted) return;
+            gameStarted = true;
+            timerInterval = setInterval(updateTimer, 1000);
+            loadQuestion();
+            showToast('🏯 开始猜谜！测试你对松赞干布的了解', 'success');
+        }
+
+        function loadQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                endGame();
+                return;
+            }
+
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `问题 ${currentQuestion + 1}/${totalQuestions}`;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const options = document.querySelectorAll('.option-btn');
+            options.forEach((btn, index) => {
+                btn.textContent = `${String.fromCharCode(65 + index)}. ${q.options[index]}`;
+                btn.className = 'option-btn';
+                btn.disabled = false;
+            });
+
+            document.getElementById('progressValue').textContent = `${currentQuestion + 1}/${totalQuestions}`;
+            const progress = ((currentQuestion) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            document.getElementById('hintArea').classList.remove('show');
+            questionAnswered = false;
+            usedHint = false;
+        }
+
+        function selectOption(index) {
+            if (questionAnswered || gamePaused) return;
+
+            questionAnswered = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option-btn');
+            
+            // Disable all buttons
+            options.forEach(btn => btn.disabled = true);
+            options.forEach(btn => btn.classList.add('disabled'));
+
+            // Show correct/wrong
+            if (index === q.correct) {
+                options[index].classList.add('correct');
+                score += usedHint ? 50 : 100;
+                correctAnswers++;
+                document.getElementById('scoreValue').textContent = score;
+                document.getElementById('correctValue').textContent = correctAnswers;
+                showToast('✅ 回答正确！', 'success');
+            } else {
+                options[index].classList.add('wrong');
+                options[q.correct].classList.add('correct');
+                showToast('❌ 回答错误', 'error');
+            }
+
+            // Next question after delay
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 2000);
+        }
+
+        function showHint() {
+            if (questionAnswered || gamePaused) return;
+            
+            usedHint = true;
+            const q = questions[currentQuestion];
+            const hintArea = document.getElementById('hintArea');
+            hintArea.textContent = `💡 提示: ${q.hint}`;
+            hintArea.classList.add('show');
+            
+            showToast('💡 使用了提示（-50分）', 'warning');
+        }
+
+        function skipQuestion() {
+            if (questionAnswered || gamePaused) return;
+
+            questionAnswered = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option-btn');
+            
+            options.forEach(btn => btn.disabled = true);
+            options.forEach(btn => btn.classList.add('disabled'));
+            options[q.correct].classList.add('correct');
+
+            showToast('⏭️ 已跳过此题', 'warning');
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        function updateTimer() {
+            if (gamePaused) return;
+            
+            timeLeft--;
+            document.getElementById('timer').textContent = timeLeft;
+
+            if (timeLeft <= 10) {
+                document.getElementById('timer').style.color = '#DC2626';
+            }
+
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            gameStarted = false;
+
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+
+            const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+
+            if (accuracy >= 80) {
+                icon.textContent = '🏆';
+                title.textContent = '太棒了！';
+                message.textContent = `你的得分: ${score}\n正确率: ${accuracy}%\n你对松赞干布非常了解！`;
+            } else if (accuracy >= 60) {
+                icon.textContent = '👍';
+                title.textContent = '不错！';
+                message.textContent = `你的得分: ${score}\n正确率: ${accuracy}%\n继续学习西藏历史吧！`;
+            } else {
+                icon.textContent = '📚';
+                title.textContent = '加油！';
+                message.textContent = `你的得分: ${score}\n正确率: ${accuracy}%\n建议多了解松赞干布的历史`;
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function togglePause() {
+            gamePaused = !gamePaused;
+            const modal = document.getElementById('pauseModal');
+            const btn = document.querySelector('.pause-btn');
+
+            if (gamePaused) {
+                modal.style.display = 'flex';
+                btn.textContent = '▶️ 继续';
+            } else {
+                modal.style.display = 'none';
+                btn.textContent = '⏸️ 暂停';
+            }
+        }
+
+        function retryGame() {
+            location.reload();
+        }
+
+        function continueRiding() {
+            showToast('🚴 继续骑行...', 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (!gameStarted) {
+                startGame();
+                return;
+            }
+
+            if (questionAnswered || gamePaused) return;
+
+            switch(e.key) {
+                case '1':
+                case 'a':
+                case 'A':
+                    selectOption(0);
+                    break;
+                case '2':
+                case 'b':
+                case 'B':
+                    selectOption(1);
+                    break;
+                case '3':
+                case 'c':
+                case 'C':
+                    selectOption(2);
+                    break;
+                case '4':
+                case 'd':
+                case 'D':
+                    selectOption(3);
+                    break;
+                case 'h':
+                case 'H':
+                    showHint();
+                    break;
+                case 's':
+                case 'S':
+                    skipQuestion();
+                    break;
+            }
+        });
+
+        // Auto-start
+        setTimeout(() => {
+            if (!gameStarted) {
+                showToast('👆 点击选项或按A/B/C/D键开始答题', 'info');
+            }
+        }, 500);
+    </script>
+</body>
+</html>

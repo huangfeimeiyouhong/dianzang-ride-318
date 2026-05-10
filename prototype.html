@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>滇藏骑行 · 交互原型</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a1628;--card:rgba(255,255,255,.06);--accent:#4fd1c5;--accent2:#f6ad55;
+  --danger:#fc8181;--text:#e2e8f0;--muted:#718096;--glass:rgba(255,255,255,.08);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;width:100vw;position:relative}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+
+/* ========== 启动页 ========== */
+#splash{background:linear-gradient(160deg,#0a1628 0%,#1a365d 40%,#2d3748 100%);align-items:center;justify-content:center;text-align:center}
+#splash .mountains{position:absolute;bottom:0;left:0;right:0;height:45%;overflow:hidden}
+#splash .mountains svg{width:100%;height:100%;opacity:.15}
+#splash .logo{font-size:42px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;z-index:1}
+#splash .sub{color:var(--muted);font-size:14px;margin:12px 0 40px;z-index:1;letter-spacing:8px}
+#splash .route-line{color:var(--accent);font-size:13px;opacity:.7;margin-bottom:30px;z-index:1}
+.btn{padding:14px 48px;border:none;border-radius:50px;font-size:16px;font-weight:600;cursor:pointer;z-index:1;transition:all .3s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#38b2ac);color:#0a1628}
+.btn-primary:active{transform:scale(.95);opacity:.9}
+
+/* ========== 骑手自定义 ========== */
+#customize{background:var(--bg);padding:20px}
+#customize .title{font-size:22px;font-weight:700;text-align:center;margin:20px 0 10px}
+.rider-preview{width:160px;height:200px;margin:10px auto 20px;position:relative;display:flex;align-items:center;justify-content:center}
+.rider-body{font-size:100px;line-height:1;filter:drop-shadow(0 4px 20px rgba(79,209,197,.3))}
+.custom-section{margin-bottom:16px}
+.custom-section .label{font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:2px}
+.options{display:flex;gap:10px;overflow-x:auto;padding:4px 0;scrollbar-width:none}
+.options::-webkit-scrollbar{display:none}
+.opt{min-width:70px;height:70px;border-radius:14px;background:var(--card);border:2px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:12px;gap:4px;flex-shrink:0}
+.opt.selected{border-color:var(--accent);background:rgba(79,209,197,.12)}
+.opt .icon{font-size:28px}
+.opt .name{color:var(--muted);font-size:10px}
+.color-opt{width:36px;height:36px;min-width:36px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:all .2s}
+.color-opt.selected{border-color:var(--accent);box-shadow:0 0 12px rgba(79,209,197,.4)}
+.colors-row{display:flex;gap:10px;align-items:center}
+.customize-bottom{margin-top:auto;padding:20px 0}
+
+/* ========== 主地图 ========== */
+#mapview{background:#0a1628}
+.map-header{padding:16px 20px 10px;display:flex;justify-content:space-between;align-items:center;background:rgba(10,22,40,.9);backdrop-filter:blur(10px);z-index:10}
+.map-header .day{font-size:13px;color:var(--muted)}
+.map-header .loc{font-size:18px;font-weight:700}
+.stats-bar{display:flex;gap:6px;padding:0 16px 12px;background:rgba(10,22,40,.9);z-index:10}
+.stat{flex:1;background:var(--card);border-radius:10px;padding:8px 10px;text-align:center}
+.stat .val{font-size:18px;font-weight:700;color:var(--accent)}
+.stat .lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.map-container{flex:1;position:relative;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.route-canvas{width:100%;min-height:1600px;position:relative;padding:20px}
+.station{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .3s;z-index:5}
+.station:hover .station-dot{transform:scale(1.3)}
+.station-dot{width:20px;height:20px;border-radius:50%;border:3px solid;flex-shrink:0;transition:all .3s;position:relative}
+.station-dot.reached{background:var(--accent);border-color:var(--accent);box-shadow:0 0 12px rgba(79,209,197,.5)}
+.station-dot.current{background:var(--accent2);border-color:var(--accent2);box-shadow:0 0 16px rgba(246,173,85,.6);animation:pulse 2s infinite}
+.station-dot.future{background:transparent;border-color:#4a5568}
+@keyframes pulse{0%,100%{box-shadow:0 0 16px rgba(246,173,85,.6)}50%{box-shadow:0 0 28px rgba(246,173,85,.8)}}
+.station-info{background:var(--glass);border-radius:10px;padding:8px 14px;backdrop-filter:blur(5px);min-width:140px}
+.station-name{font-size:14px;font-weight:600}
+.station-detail{font-size:11px;color:var(--muted);margin-top:2px}
+.station-riders{display:flex;margin-top:6px;gap:-4px}
+.rider-avatar{width:22px;height:22px;border-radius:50%;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:10px;margin-left:-6px;cursor:pointer}
+.rider-avatar:first-child{margin-left:0}
+.rider-count{font-size:10px;color:var(--accent);margin-left:4px;align-self:center}
+.route-path{position:absolute;left:50%;width:3px;transform:translateX(-50%);z-index:1}
+.route-path.done{background:linear-gradient(180deg,var(--accent),var(--accent2))}
+.route-path.undone{background:#2d3748;opacity:.5}
+.my-rider{position:absolute;left:50%;transform:translateX(-50%) translateX(30px);z-index:8;font-size:28px;filter:drop-shadow(0 2px 8px rgba(246,173,85,.5));transition:top .5s;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateX(30px) translateY(0)}50%{transform:translateX(-50%) translateX(30px) translateY(-6px)}}
+.map-bottom{padding:12px 16px;background:rgba(10,22,40,.95);backdrop-filter:blur(10px);z-index:10;display:flex;gap:10px}
+.map-bottom .btn{flex:1;padding:12px;font-size:14px;border-radius:12px}
+.btn-ride{background:linear-gradient(135deg,var(--accent),#38b2ac);color:#0a1628}
+.btn-event{background:linear-gradient(135deg,var(--accent2),#ed8936);color:#0a1628}
+
+/* ========== 站点弹窗 ========== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:#1a202c;border-radius:20px 20px 0 0;width:100%;max-width:420px;max-height:75vh;overflow-y:auto;padding:24px 20px 30px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:#4a5568;border-radius:2px;margin:0 auto 16px}
+.modal h3{font-size:20px;margin-bottom:4px}
+.modal .elev{color:var(--accent);font-size:13px;margin-bottom:12px}
+.modal .desc{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:16px}
+.modal .riders-title{font-size:13px;color:var(--muted);margin-bottom:8px}
+.rider-list{display:flex;flex-direction:column;gap:8px}
+.rider-item{display:flex;align-items:center;gap:10px;background:var(--card);padding:10px 12px;border-radius:10px}
+.rider-item .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+.rider-item .info{flex:1}
+.rider-item .name{font-size:13px;font-weight:600}
+.rider-item .title-tag{font-size:10px;color:var(--accent);background:rgba(79,209,197,.12);padding:2px 8px;border-radius:4px;display:inline-block;margin-top:2px}
+
+/* ========== 骑行动画 ========== */
+#ridingAnim{background:var(--bg);align-items:center;justify-content:center;flex-direction:column}
+.riding-scene{width:100%;height:300px;position:relative;overflow:hidden;margin-bottom:30px}
+.road{position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(0deg,#2d3748,#1a202c);overflow:hidden}
+.road-line{position:absolute;width:4px;height:30px;background:var(--accent);opacity:.3;left:50%;animation:roadMove 1s linear infinite}
+@keyframes roadMove{from{bottom:-30px}to{bottom:120px}}
+.riding-rider{position:absolute;bottom:130px;left:50%;transform:translateX(-50%);font-size:60px;animation:riderBounce .5s ease-in-out infinite}
+@keyframes riderBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
+.riding-bg{position:absolute;top:0;left:0;right:0;bottom:120px;overflow:hidden}
+.mountain-bg{position:absolute;font-size:80px;opacity:.15;animation:bgScroll 8s linear infinite}
+@keyframes bgScroll{from{transform:translateX(100vw)}to{transform:translateX(-100px)}}
+.km-counter{font-size:48px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.km-label{font-size:14px;color:var(--muted);margin-top:4px}
+.riding-progress{width:80%;height:6px;background:#2d3748;border-radius:3px;margin-top:20px;overflow:hidden}
+.riding-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s}
+.riding-info{text-align:center;margin-top:12px;font-size:12px;color:var(--muted)}
+
+/* ========== 落石小关卡 ========== */
+#rockGame{background:linear-gradient(180deg,#1a202c 0%,#2d3748 100%);flex-direction:column}
+.game-hud{padding:14px 20px;display:flex;justify-content:space-between;align-items:center;z-index:20}
+.game-hud .wave{font-size:14px;color:var(--accent2)}
+.game-hud .hp-bar{width:120px;height:8px;background:#2d3748;border-radius:4px;overflow:hidden}
+.game-hud .hp-fill{height:100%;background:linear-gradient(90deg,var(--danger),var(--accent2));border-radius:4px;transition:width .3s}
+.game-hud .score{font-size:14px;color:var(--accent)}
+.game-area{flex:1;position:relative;overflow:hidden;touch-action:none}
+.game-lane{position:absolute;top:0;bottom:0;border-right:1px solid rgba(255,255,255,.03)}
+.game-rider{position:absolute;bottom:60px;width:50px;height:50px;font-size:36px;transition:left .15s ease-out;z-index:10;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 4px 12px rgba(79,209,197,.3))}
+.rock{position:absolute;font-size:32px;z-index:5;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.game-result{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,22,40,.9);backdrop-filter:blur(8px);z-index:30;text-align:center}
+.game-result.show{display:flex}
+.game-result h2{font-size:28px;margin-bottom:8px}
+.game-result .reward{color:var(--accent);font-size:16px;margin-bottom:24px}
+.game-result .fail-text{color:var(--danger);font-size:16px;margin-bottom:8px}
+.game-result .ad-btn{background:var(--accent2);color:#0a1628;padding:12px 32px;border:none;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px}
+.game-result .skip-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:8px;text-decoration:underline}
+.game-warning{position:absolute;top:40%;left:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:800;color:var(--danger);opacity:0;z-index:25;text-shadow:0 2px 12px rgba(252,129,129,.5);pointer-events:none}
+
+/* ========== 通用 ========== */
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.slide-left{animation:slideLeft .35s ease}
+@keyframes slideLeft{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* 事件触发通知 */
+.event-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(26,32,44,.95);border:1px solid var(--danger);border-radius:16px;padding:24px 32px;text-align:center;z-index:200;display:none;backdrop-filter:blur(10px);animation:toastIn .4s ease}
+@keyframes toastIn{from{transform:translate(-50%,-50%) scale(.8);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.event-toast .icon{font-size:48px;margin-bottom:8px}
+.event-toast .title{font-size:20px;font-weight:700;margin-bottom:4px}
+.event-toast .desc{font-size:13px;color:var(--muted);margin-bottom:16px}
+
+/* 骑行结算 */
+.ride-summary{text-align:center;padding:20px}
+.ride-summary h3{font-size:20px;margin-bottom:16px}
+.summary-stats{display:flex;gap:12px;justify-content:center;margin-bottom:20px}
+.summary-stat{background:var(--card);padding:14px 20px;border-radius:12px;min-width:80px}
+.summary-stat .v{font-size:22px;font-weight:700;color:var(--accent)}
+.summary-stat .l{font-size:11px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- ==================== 启动页 ==================== -->
+<div id="splash" class="screen active">
+  <div class="mountains"><svg viewBox="0 0 400 200"><polygon fill="#1a365d" points="0,200 60,80 120,160 200,40 280,120 340,60 400,200"/><polygon fill="#2d3748" points="0,200 80,120 160,180 240,100 320,150 400,200"/></svg></div>
+  <div class="logo">滇藏骑行</div>
+  <div class="sub">大理 → 拉萨</div>
+  <div class="route-line">2100 km · 13 站 · 一段传奇</div>
+  <button class="btn btn-primary" onclick="goTo('customize')">开始旅程</button>
+</div>
+
+<!-- ==================== 骑手自定义 ==================== -->
+<div id="customize" class="screen">
+  <div class="title">自定义骑手</div>
+  <div class="rider-preview"><div class="rider-body" id="previewRider">🚴</div></div>
+
+  <div class="custom-section">
+    <div class="label">头盔</div>
+    <div class="options" id="helmetOpts"></div>
+  </div>
+  <div class="custom-section">
+    <div class="label">骑行服</div>
+    <div class="options" id="jerseyOpts"></div>
+  </div>
+  <div class="custom-section">
+    <div class="label">车型</div>
+    <div class="options" id="bikeOpts"></div>
+  </div>
+  <div class="custom-section">
+    <div class="label">主题色</div>
+    <div class="colors-row" id="colorOpts"></div>
+  </div>
+
+  <div class="customize-bottom">
+    <button class="btn btn-primary" style="width:100%" onclick="startJourney()">出发！</button>
+  </div>
+</div>
+
+<!-- ==================== 主地图 ==================== -->
+<div id="mapview" class="screen">
+  <div class="map-header">
+    <div><div class="day" id="mapDay">第 1 天</div><div class="loc" id="mapLoc">大理古城</div></div>
+    <div style="text-align:right"><div class="day">海拔</div><div class="loc" id="mapElev">1900m</div></div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="val" id="stEnergy">156</div><div class="lbl">体能</div></div>
+    <div class="stat"><div class="val" id="stKm">0 km</div><div class="lbl">已骑行</div></div>
+    <div class="stat"><div class="val" id="stMood">😊 100</div><div class="lbl">心情</div></div>
+    <div class="stat"><div class="val" id="stBike">100%</div><div class="lbl">耐久</div></div>
+  </div>
+  <div class="map-container" id="mapScroll">
+    <div class="route-canvas" id="routeCanvas"></div>
+  </div>
+  <div class="map-bottom">
+    <button class="btn btn-ride" onclick="startRiding()">🚴 骑行出发</button>
+    <button class="btn btn-event" onclick="triggerRockEvent()">⚡ 模拟事件</button>
+  </div>
+</div>
+
+<!-- ==================== 骑行动画 ==================== -->
+<div id="ridingAnim" class="screen">
+  <div class="riding-scene">
+    <div class="riding-bg" id="ridingBg"></div>
+    <div class="road">
+      <div class="road-line" style="animation-delay:0s"></div>
+      <div class="road-line" style="animation-delay:.25s;left:calc(50% - 30px)"></div>
+      <div class="road-line" style="animation-delay:.5s;left:calc(50% + 30px)"></div>
+    </div>
+    <div class="riding-rider" id="ridingRiderIcon">🚴</div>
+  </div>
+  <div class="km-counter" id="ridingKm">0.0</div>
+  <div class="km-label">本次骑行 (km)</div>
+  <div class="riding-progress"><div class="riding-progress-fill" id="ridingBar" style="width:0%"></div></div>
+  <div class="riding-info" id="ridingInfo">消耗体能中…</div>
+  <div style="margin-top:auto;padding:20px;width:100%">
+    <button class="btn btn-primary" style="width:100%;display:none" id="ridingDone" onclick="finishRiding()">继续旅程</button>
+  </div>
+</div>
+
+<!-- ==================== 落石小关卡 ==================== -->
+<div id="rockGame" class="screen">
+  <div class="game-hud">
+    <div class="wave" id="gameWave">第 1 波</div>
+    <div class="hp-bar"><div class="hp-fill" id="gameHp" style="width:100%"></div></div>
+    <div class="score" id="gameScore">+0</div>
+  </div>
+  <div class="game-area" id="gameArea">
+    <div class="game-rider" id="gameRider">🚴</div>
+    <div class="game-warning" id="gameWarning">⚠️ 落石！</div>
+    <div class="game-result" id="gameResult">
+      <h2 id="resultTitle">挑战成功！</h2>
+      <div class="reward" id="resultReward">体能 +10</div>
+      <div class="fail-text" id="resultFail" style="display:none"></div>
+      <button class="ad-btn" id="resultAdBtn" style="display:none" onclick="adRevive()">📺 看广告复活</button>
+      <button class="btn btn-primary" id="resultOk" onclick="exitGame()">继续骑行</button>
+      <button class="skip-btn" id="resultSkip" style="display:none" onclick="exitGame()">跳过，接受惩罚</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 事件触发通知 ==================== -->
+<div class="event-toast" id="eventToast">
+  <div class="icon">🪨</div>
+  <div class="title">前方落石！</div>
+  <div class="desc">左右滑动躲避滚石，共 3 波</div>
+  <button class="btn btn-primary" style="margin-top:6px" onclick="startRockGame()">接受挑战</button>
+</div>
+
+<!-- ==================== 站点弹窗 ==================== -->
+<div class="modal-overlay" id="stationModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="modalName"></h3>
+    <div class="elev" id="modalElev"></div>
+    <div class="desc" id="modalDesc"></div>
+    <div class="riders-title">🏕 在此驻扎的骑友</div>
+    <div class="rider-list" id="modalRiders"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="closeModal()">关闭</button>
+  </div>
+</div>
+
+<script>
+// ========== 数据 ==========
+const STATIONS = [
+  {name:'大理古城',km:0,elev:1900,icon:'🏁',desc:'起点。风花雪月的大理，补满装备再出发。',event:'装备店、美食回血'},
+  {name:'丽江',km:180,elev:2400,icon:'🏔',desc:'玉龙雪山下的古城，初次感受高原的气息。',event:'初遇高原'},
+  {name:'香格里拉',km:320,elev:3300,icon:'🙏',desc:'海拔突破3000米，真正的高原骑行开始了。',event:'第一次高反检测'},
+  {name:'德钦（梅里）',km:480,elev:3400,icon:'❄️',desc:'梅里雪山祈福，天气变幻莫测。能否看到日照金山？',event:'天气突变'},
+  {name:'盐井',km:560,elev:2400,icon:'🧂',desc:'澜沧江峡谷中的千年盐田，短暂的低海拔喘息。',event:'盐田奇景'},
+  {name:'芒康',km:660,elev:3870,icon:'🔀',desc:'滇藏线与川藏线在此交汇，补给重镇。',event:'补给站'},
+  {name:'左贡',km:790,elev:3780,icon:'⛰️',desc:'横断山脉深处，连续翻越山口。',event:'翻越山口'},
+  {name:'八宿',km:920,elev:3260,icon:'🛤️',desc:'传说中的怒江72拐，最考验车技的路段。',event:'怒江72拐'},
+  {name:'然乌',km:1010,elev:3940,icon:'🏔️',desc:'然乌湖，冰川融水汇成的碧蓝。',event:'冰川融水'},
+  {name:'波密',km:1100,elev:2700,icon:'🌸',desc:'桃花盛开的低海拔峡谷，难得的轻松路段。',event:'桃花盛开'},
+  {name:'通麦天险',km:1160,elev:2000,icon:'⚠️',desc:'全程最危险路段！塌方、泥石流高发区。',event:'高危路段'},
+  {name:'林芝',km:1300,elev:2990,icon:'🌺',desc:'雅鲁藏布江边的藏东江南。',event:'桃花节'},
+  {name:'墨竹工卡',km:1900,elev:3800,icon:'🏗️',desc:'冲刺前的最后一站，拉萨近在眼前。',event:'最后高原'},
+  {name:'拉萨',km:2100,elev:3650,icon:'🏆',desc:'布达拉宫！2100公里的传奇旅途完成！',event:'终点'}
+];
+
+const FAKE_RIDERS = [
+  {name:'骑行侠小张',emoji:'🚴‍♂️',color:'#4fd1c5',title:'高原老手',station:2},
+  {name:'藏线追风人',emoji:'🚴‍♀️',color:'#f6ad55',title:'新手骑手',station:0},
+  {name:'老王去西藏',emoji:'🚴',color:'#fc8181',title:'耐力王者',station:1},
+  {name:'骑闪电的少女',emoji:'🚴‍♀️',color:'#b794f4',title:'速度女王',station:0},
+  {name:'佛系骑手Lily',emoji:'🚴‍♀️',color:'#68d391',title:'佛系骑手',station:3},
+  {name:'公路车小李',emoji:'🚴‍♂️',color:'#63b3ed',title:'装备党',station:1},
+  {name:'摸鱼骑行家',emoji:'🚴',color:'#fbb6ce',title:'摸鱼专家',station:0},
+  {name:'川藏线老司机',emoji:'🚴‍♂️',color:'#f6e05e',title:'拉萨勇士',station:5},
+  {name:'单车环球梦',emoji:'🚴‍♀️',color:'#9ae6b4',title:'环球骑手',station:2},
+  {name:'夜骑达人',emoji:'🚴‍♂️',color:'#e9d8fd',title:'夜行者',station:0},
+  {name:'云端骑行者',emoji:'🚴',color:'#fefcbf',title:'云端玩家',station:4},
+  {name:'格桑花骑士',emoji:'🚴‍♀️',color:'#feb2b2',title:'藏地精灵',station:1},
+];
+
+// ========== 状态 ==========
+let state = {
+  day:1, km:0, energy:156, mood:100, durability:100,
+  currentStation:0, helmet:0, jersey:0, bike:0, themeColor:'#4fd1c5',
+  riderEmoji:'🚴'
+};
+
+const helmets = [{icon:'⛑️',name:'经典款'},{icon:'🪖',name:'军绿款'},{icon:'👷',name:'赛车款'},{icon:'🎿',name:'反光款'}];
+const jerseys = [{icon:'👕',name:'素色'},{icon:'🦺',name:'荧光'},{icon:'🎽',name:'渐变'},{icon:'👘',name:'民族风'}];
+const bikes = [{icon:'🚲',name:'登山车',emoji:'🚴'},{icon:'🚴',name:'公路车',emoji:'🚴‍♂️'},{icon:'🛵',name:'复古车',emoji:'🚴‍♀️'}];
+const colors = ['#4fd1c5','#f6ad55','#fc8181','#b794f4','#68d391','#63b3ed','#f6e05e'];
+
+// ========== 页面切换 ==========
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='customize') initCustomize();
+  if(id==='mapview') renderMap();
+}
+
+// ========== 骑手自定义 ==========
+function initCustomize(){
+  renderOpts('helmetOpts',helmets,'helmet');
+  renderOpts('jerseyOpts',jerseys,'jersey');
+  renderOpts('bikeOpts',bikes,'bike');
+  renderColors();
+}
+function renderOpts(containerId,items,key){
+  const c=document.getElementById(containerId);
+  c.innerHTML=items.map((it,i)=>`<div class="opt ${state[key]===i?'selected':''}" onclick="selectOpt('${key}',${i},'${containerId}')"><span class="icon">${it.icon}</span><span class="name">${it.name}</span></div>`).join('');
+}
+function renderColors(){
+  const c=document.getElementById('colorOpts');
+  c.innerHTML=colors.map(cl=>`<div class="color-opt ${state.themeColor===cl?'selected':''}" style="background:${cl}" onclick="selectColor('${cl}')"></div>`).join('');
+}
+function selectOpt(key,idx,containerId){
+  state[key]=idx;
+  if(key==='bike') state.riderEmoji=bikes[idx].emoji;
+  document.getElementById('previewRider').textContent=state.riderEmoji;
+  const items = key==='helmet'?helmets:key==='jersey'?jerseys:bikes;
+  renderOpts(containerId,items,key);
+}
+function selectColor(cl){
+  state.themeColor=cl;
+  document.documentElement.style.setProperty('--accent',cl);
+  renderColors();
+}
+function startJourney(){goTo('mapview')}
+
+// ========== 主地图 ==========
+function renderMap(){
+  const canvas=document.getElementById('routeCanvas');
+  const totalH=1500;
+  canvas.style.minHeight=totalH+'px';
+  let html='';
+
+  STATIONS.forEach((st,i)=>{
+    const y=40+i*(totalH-80)/(STATIONS.length-1);
+    const side=i%2===0?'flex-direction:row':'flex-direction:row-reverse';
+    const dotClass=i<state.currentStation?'reached':i===state.currentStation?'current':'future';
+
+    // 路径线
+    if(i<STATIONS.length-1){
+      const nextY=40+(i+1)*(totalH-80)/(STATIONS.length-1);
+      const lineClass=i<state.currentStation?'done':'undone';
+      html+=`<div class="route-path ${lineClass}" style="top:${y+10}px;height:${nextY-y}px"></div>`;
+    }
+
+    // 站点骑友
+    const ridersHere=FAKE_RIDERS.filter(r=>r.station===i);
+    let ridersHtml='';
+    if(ridersHere.length>0){
+      ridersHtml='<div class="station-riders">';
+      const show=ridersHere.slice(0,4);
+      show.forEach(r=>{ridersHtml+=`<div class="rider-avatar" style="background:${r.color}">${r.emoji.slice(0,2)}</div>`});
+      if(ridersHere.length>4) ridersHtml+=`<span class="rider-count">+${ridersHere.length-4}</span>`;
+      ridersHtml+='</div>';
+    }
+
+    html+=`<div class="station" style="top:${y}px;${side}" onclick="openStation(${i})">
+      <div class="station-dot ${dotClass}"></div>
+      <div class="station-info">
+        <div class="station-name">${st.icon} ${st.name}</div>
+        <div class="station-detail">${st.km}km · ${st.elev}m</div>
+        ${ridersHtml}
+      </div>
+    </div>`;
+  });
+
+  // 我的骑手
+  const myY=40+state.currentStation*(totalH-80)/(STATIONS.length-1);
+  html+=`<div class="my-rider" style="top:${myY-20}px">${state.riderEmoji}</div>`;
+
+  canvas.innerHTML=html;
+  updateMapHeader();
+}
+
+function updateMapHeader(){
+  const st=STATIONS[state.currentStation];
+  document.getElementById('mapDay').textContent=`第 ${state.day} 天`;
+  document.getElementById('mapLoc').textContent=st.name;
+  document.getElementById('mapElev').textContent=st.elev+'m';
+  document.getElementById('stEnergy').textContent=state.energy;
+  document.getElementById('stKm').textContent=state.km+' km';
+  document.getElementById('stMood').textContent=(state.mood>=80?'😊':state.mood>=50?'😐':'😫')+' '+state.mood;
+  document.getElementById('stBike').textContent=state.durability+'%';
+}
+
+function openStation(idx){
+  const st=STATIONS[idx];
+  const ridersHere=FAKE_RIDERS.filter(r=>r.station===idx);
+  document.getElementById('modalName').textContent=st.icon+' '+st.name;
+  document.getElementById('modalElev').textContent=`海拔 ${st.elev}m · 距起点 ${st.km}km`;
+  document.getElementById('modalDesc').textContent=st.desc;
+
+  let rhtml='';
+  if(ridersHere.length===0){
+    rhtml='<div style="color:var(--muted);font-size:13px;padding:8px 0">暂无骑友在此</div>';
+  } else {
+    ridersHere.forEach(r=>{
+      rhtml+=`<div class="rider-item"><div class="avatar" style="background:${r.color}">${r.emoji}</div><div class="info"><div class="name">${r.name}</div><div class="title-tag">${r.title}</div></div></div>`;
+    });
+  }
+  document.getElementById('modalRiders').innerHTML=rhtml;
+  document.getElementById('stationModal').classList.add('show');
+}
+function closeModal(){document.getElementById('stationModal').classList.remove('show')}
+document.getElementById('stationModal').addEventListener('click',function(e){
+  if(e.target===this) closeModal();
+});
+
+// ========== 骑行动画 ==========
+let ridingInterval=null;
+function startRiding(){
+  if(state.energy<=0||state.currentStation>=STATIONS.length-1) return;
+  goTo('ridingAnim');
+  document.getElementById('ridingRiderIcon').textContent=state.riderEmoji;
+
+  // 背景山
+  const bg=document.getElementById('ridingBg');
+  bg.innerHTML='';
+  const mtns=['🏔','⛰️','🗻','❄️','🌲'];
+  for(let i=0;i<5;i++){
+    const d=document.createElement('div');
+    d.className='mountain-bg';
+    d.textContent=mtns[i%mtns.length];
+    d.style.top=(10+Math.random()*40)+'%';
+    d.style.animationDelay=(i*1.5)+'s';
+    d.style.animationDuration=(6+Math.random()*4)+'s';
+    bg.appendChild(d);
+  }
+
+  const nextStation=STATIONS[state.currentStation+1];
+  const dist=nextStation.km-state.km;
+  const totalSegment=Math.min(dist,80); // 每次最多骑80km
+  let ridden=0;
+  const costPerKm=nextStation.elev>3500?2:nextStation.elev>3000?1.5:1;
+
+  document.getElementById('ridingDone').style.display='none';
+  document.getElementById('ridingKm').textContent='0.0';
+  document.getElementById('ridingBar').style.width='0%';
+
+  ridingInterval=setInterval(()=>{
+    if(state.energy<=0||ridden>=totalSegment){
+      clearInterval(ridingInterval);
+      finishRidingAnim(ridden);
+      return;
+    }
+    ridden+=2;
+    state.km+=2;
+    state.energy-=Math.ceil(costPerKm);
+
+    document.getElementById('ridingKm').textContent=ridden.toFixed(1);
+    document.getElementById('ridingBar').style.width=(ridden/totalSegment*100)+'%';
+    document.getElementById('ridingInfo').textContent=`体能 ${state.energy} · 海拔 ${STATIONS[state.currentStation].elev}m · 消耗系数 ×${costPerKm}`;
+
+    // 到达下一站？
+    if(state.km>=nextStation.km){
+      state.currentStation++;
+      clearInterval(ridingInterval);
+      finishRidingAnim(ridden);
+    }
+  },200);
+}
+
+function finishRidingAnim(ridden){
+  document.getElementById('ridingInfo').innerHTML=`<div class="ride-summary"><h3>骑行结束</h3><div class="summary-stats"><div class="summary-stat"><div class="v">${ridden.toFixed(1)}</div><div class="l">公里</div></div><div class="summary-stat"><div class="v">${state.energy}</div><div class="l">剩余体能</div></div><div class="summary-stat"><div class="v">${STATIONS[state.currentStation].name}</div><div class="l">当前位置</div></div></div></div>`;
+  document.getElementById('ridingDone').style.display='block';
+  state.day++;
+}
+function finishRiding(){
+  goTo('mapview');
+  renderMap();
+  // 随机触发事件
+  if(Math.random()>0.5&&state.currentStation>0){
+    setTimeout(()=>triggerRockEvent(),800);
+  }
+}
+
+// ========== 落石事件 ==========
+function triggerRockEvent(){
+  const toast=document.getElementById('eventToast');
+  toast.style.display='block';
+}
+function startRockGame(){
+  document.getElementById('eventToast').style.display='none';
+  goTo('rockGame');
+  initRockGame();
+}
+
+let gameState={hp:100,score:0,wave:1,lane:1,active:false,rocks:[],spawnTimer:null,gameTimer:null,touchStartX:0};
+
+function initRockGame(){
+  const area=document.getElementById('gameArea');
+  const rider=document.getElementById('gameRider');
+  const w=area.offsetWidth||375;
+  gameState={hp:100,score:0,wave:1,lane:1,active:true,rocks:[],spawnTimer:null,gameTimer:null,touchStartX:0};
+
+  // 3条车道
+  const laneW=w/3;
+  rider.textContent=state.riderEmoji;
+  rider.style.left=(gameState.lane*laneW+laneW/2-25)+'px';
+
+  // 清除旧石头
+  area.querySelectorAll('.rock').forEach(r=>r.remove());
+  document.getElementById('gameResult').classList.remove('show');
+  document.getElementById('gameWarning').style.opacity='0';
+  updateGameHud();
+
+  // 开场警告
+  const warn=document.getElementById('gameWarning');
+  warn.style.opacity='1';
+  warn.textContent='⚠️ 落石！';
+  setTimeout(()=>{warn.style.opacity='0';startWave()},1000);
+
+  // 触控
+  area.ontouchstart=(e)=>{gameState.touchStartX=e.touches[0].clientX};
+  area.ontouchmove=(e)=>e.preventDefault();
+  area.ontouchend=(e)=>{
+    if(!gameState.active) return;
+    const dx=e.changedTouches[0].clientX-gameState.touchStartX;
+    if(Math.abs(dx)<30) return;
+    if(dx<0&&gameState.lane>0) gameState.lane--;
+    else if(dx>0&&gameState.lane<2) gameState.lane++;
+    const lW=(area.offsetWidth||375)/3;
+    rider.style.left=(gameState.lane*lW+lW/2-25)+'px';
+  };
+  // 鼠标
+  area.onmousedown=(e)=>{gameState.touchStartX=e.clientX};
+  area.onmouseup=(e)=>{
+    if(!gameState.active) return;
+    const dx=e.clientX-gameState.touchStartX;
+    if(Math.abs(dx)<30) return;
+    if(dx<0&&gameState.lane>0) gameState.lane--;
+    else if(dx>0&&gameState.lane<2) gameState.lane++;
+    const lW=(area.offsetWidth||375)/3;
+    rider.style.left=(gameState.lane*lW+lW/2-25)+'px';
+  };
+  // 键盘
+  document.onkeydown=(e)=>{
+    if(!gameState.active) return;
+    if(e.key==='ArrowLeft'&&gameState.lane>0) gameState.lane--;
+    else if(e.key==='ArrowRight'&&gameState.lane<2) gameState.lane++;
+    const lW=(area.offsetWidth||375)/3;
+    rider.style.left=(gameState.lane*lW+lW/2-25)+'px';
+  };
+}
+
+function startWave(){
+  if(!gameState.active) return;
+  const area=document.getElementById('gameArea');
+  const w=area.offsetWidth||375;
+  const laneW=w/3;
+  const speeds=[3,4.5,6];
+  const spd=speeds[Math.min(gameState.wave-1,2)];
+  const intervals=[700,500,350];
+  const intv=intervals[Math.min(gameState.wave-1,2)];
+  let rocksInWave=0;
+  const maxRocks=[6,8,12][Math.min(gameState.wave-1,2)];
+
+  gameState.spawnTimer=setInterval(()=>{
+    if(!gameState.active||rocksInWave>=maxRocks){
+      clearInterval(gameState.spawnTimer);
+      // 等最后一个石头落完
+      setTimeout(()=>{
+        if(!gameState.active) return;
+        if(gameState.wave<3){
+          gameState.wave++;
+          updateGameHud();
+          const warn=document.getElementById('gameWarning');
+          warn.textContent=`第 ${gameState.wave} 波！`;
+          warn.style.opacity='1';
+          setTimeout(()=>{warn.style.opacity='0';startWave()},800);
+        } else {
+          gameWin();
+        }
+      },2000);
+      return;
+    }
+
+    const lane=Math.floor(Math.random()*3);
+    const rockEmojis=['🪨','🪨','💎','🪨','⬛'];
+    const rock=document.createElement('div');
+    rock.className='rock';
+    rock.textContent=rockEmojis[Math.floor(Math.random()*rockEmojis.length)];
+    rock.style.left=(lane*laneW+laneW/2-16)+'px';
+    rock.style.top='-40px';
+    rock.dataset.lane=lane;
+    area.appendChild(rock);
+    rocksInWave++;
+
+    let posY=-40;
+    const aH=area.offsetHeight||500;
+    const fall=setInterval(()=>{
+      if(!gameState.active){clearInterval(fall);rock.remove();return}
+      posY+=spd;
+      rock.style.top=posY+'px';
+
+      // 碰撞检测
+      if(posY>aH-120&&posY<aH-40&&parseInt(rock.dataset.lane)===gameState.lane){
+        gameState.hp-=15;
+        rock.style.opacity='.3';
+        updateGameHud();
+        if(gameState.hp<=0){
+          gameState.active=false;
+          clearInterval(fall);
+          clearInterval(gameState.spawnTimer);
+          gameLose();
+          return;
+        }
+      }
+      if(posY>aH){
+        clearInterval(fall);
+        rock.remove();
+        if(parseInt(rock.dataset.lane)!==gameState.lane) gameState.score+=5;
+        updateGameHud();
+      }
+    },30);
+  },intv);
+}
+
+function updateGameHud(){
+  document.getElementById('gameWave').textContent=`第 ${gameState.wave} 波`;
+  document.getElementById('gameHp').style.width=Math.max(0,gameState.hp)+'%';
+  document.getElementById('gameScore').textContent=`+${gameState.score}`;
+}
+
+function gameWin(){
+  gameState.active=false;
+  const res=document.getElementById('gameResult');
+  document.getElementById('resultTitle').textContent='🎉 挑战成功！';
+  document.getElementById('resultTitle').style.color=state.themeColor;
+  document.getElementById('resultReward').textContent=`体能 +10 · 金币 +${gameState.score}`;
+  document.getElementById('resultReward').style.display='block';
+  document.getElementById('resultFail').style.display='none';
+  document.getElementById('resultAdBtn').style.display='none';
+  document.getElementById('resultSkip').style.display='none';
+  document.getElementById('resultOk').textContent='继续骑行';
+  res.classList.add('show');
+  state.energy=Math.min(200,state.energy+10);
+}
+
+function gameLose(){
+  gameState.active=false;
+  const res=document.getElementById('gameResult');
+  document.getElementById('resultTitle').textContent='💥 挑战失败';
+  document.getElementById('resultTitle').style.color='var(--danger)';
+  document.getElementById('resultReward').style.display='none';
+  document.getElementById('resultFail').textContent='体能 -20 · 装备耐久 -1';
+  document.getElementById('resultFail').style.display='block';
+  document.getElementById('resultAdBtn').style.display='block';
+  document.getElementById('resultSkip').style.display='block';
+  document.getElementById('resultOk').style.display='none';
+  res.classList.add('show');
+}
+
+function adRevive(){
+  // 模拟广告
+  document.getElementById('resultAdBtn').textContent='广告加载中…';
+  setTimeout(()=>{
+    document.getElementById('gameResult').classList.remove('show');
+    document.getElementById('resultAdBtn').textContent='📺 看广告复活';
+    gameState.hp=60;
+    gameState.active=true;
+    updateGameHud();
+    // 继续当前波
+    startWave();
+  },1500);
+}
+
+function exitGame(){
+  gameState.active=false;
+  document.onkeydown=null;
+  goTo('mapview');
+  renderMap();
+}
+
+// ========== 初始化 ==========
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('previewRider').textContent=state.riderEmoji;
+});
+</script>
+</body>
+</html>

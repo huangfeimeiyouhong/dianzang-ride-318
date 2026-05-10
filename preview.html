@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>滇藏骑行 - 游戏预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a1628;
+    --bg-card: rgba(255, 255, 255, 0.06);
+    --bg-glass: rgba(255, 255, 255, 0.08);
+    --accent: #4fd1c5;
+    --accent2: #f6ad55;
+    --danger: #fc8181;
+    --success: #68d391;
+    --text: #e2e8f0;
+    --text-muted: #718096;
+    --border: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    background: #111;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Preview shell */
+  .preview-shell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .preview-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .preview-subtitle {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  /* Phone frame */
+  .phone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+    width: 100%;
+    max-width: 1400px;
+  }
+
+  .phone-frame {
+    width: 375px;
+    height: 720px;
+    border-radius: 40px;
+    border: 3px solid #333;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+
+  .phone-label {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .phone-content {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .phone-content::-webkit-scrollbar { width: 0; }
+
+  /* ========== Page-specific styles ========== */
+
+  /* MAP PAGE */
+  .map-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg);
+    font-size: 13px;
+  }
+
+  .weather-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    background: rgba(0, 0, 0, 0.25);
+    padding-top: 28px;
+  }
+
+  .weather-info { display: flex; align-items: center; gap: 6px; }
+  .weather-icon { font-size: 16px; }
+  .weather-name { font-size: 13px; color: var(--text); font-weight: 600; }
+  .weather-desc { font-size: 11px; color: var(--text-muted); margin-left: 4px; }
+  .cost-badge { font-size: 11px; color: var(--danger); background: rgba(252, 129, 129, 0.12); padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+
+  .status-bar { padding: 8px 16px; background: rgba(0, 0, 0, 0.3); }
+  .status-row { display: flex; align-items: center; justify-content: space-between; }
+  .status-item { display: flex; align-items: center; gap: 4px; }
+  .status-item.location { flex: 1; justify-content: center; }
+  .status-label { font-size: 12px; color: var(--text-muted); }
+  .status-value { font-size: 14px; color: var(--text); font-weight: 600; }
+
+  .stats-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px 12px; }
+  .stat-card { display: flex; align-items: center; gap: 8px; background: var(--bg-card); border-radius: 10px; padding: 8px 10px; }
+  .stat-icon { font-size: 18px; }
+  .stat-info { flex: 1; }
+  .stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+  .stat-bar-wrap { width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; margin: 3px 0; overflow: hidden; }
+  .stat-bar-fill { height: 100%; border-radius: 2px; }
+  .stat-bar-fill.energy { background: linear-gradient(90deg, var(--accent), #38b2ac); }
+  .stat-bar-fill.mood { background: linear-gradient(90deg, var(--accent2), #f6e05e); }
+  .stat-bar-fill.durability { background: linear-gradient(90deg, #68d391, #38a169); }
+  .stat-bar-fill.adapt { background: linear-gradient(90deg, #b794f4, #805ad5); }
+  .stat-num { font-size: 10px; color: var(--text-muted); }
+  .stat-num.highlight { font-size: 14px; color: var(--accent); font-weight: 700; }
+  .stat-num.coin-text { font-size: 14px; color: var(--accent2); font-weight: 700; }
+
+  /* Route scroll */
+  .route-scroll { flex: 1; padding: 8px 16px; overflow-y: auto; }
+  .route-line { display: flex; flex-direction: column; padding-bottom: 100px; }
+  .station-node { position: relative; display: flex; align-items: flex-start; padding-left: 40px; min-height: 60px; margin-bottom: 4px; }
+  .connector { position: absolute; left: 14px; top: -24px; width: 3px; height: 24px; background: rgba(255,255,255,0.08); overflow: hidden; }
+  .connector.active { background: rgba(79, 209, 197, 0.15); }
+  .connector-fill { width: 100%; background: var(--accent); }
+  .node-dot { position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 2; }
+  .node-dot.dot-active { border-color: var(--accent); background: rgba(79, 209, 197, 0.15); box-shadow: 0 0 10px rgba(79, 209, 197, 0.3); }
+  .node-icon { font-size: 14px; }
+  .station-node.current .node-dot { transform: scale(1.2); border-color: var(--accent); background: var(--accent); }
+  .node-info { flex: 1; padding-top: 2px; }
+  .node-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .station-node.future .node-name { color: var(--text-muted); }
+  .station-node.current .node-name { color: var(--accent); }
+  .node-meta { display: flex; gap: 10px; margin-top: 2px; }
+  .node-km, .node-elev { font-size: 11px; color: var(--text-muted); }
+
+  /* Rider bubbles + pulse */
+  .rider-bubbles { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+  .bubble-avatars { display: flex; }
+  .bubble-emoji { font-size: 12px; margin-right: -4px; }
+  .bubble-count { font-size: 10px; color: var(--accent); margin-left: 4px; }
+
+  /* Pulse animation */
+  .rider-pulse {
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--success);
+    animation: pulse 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.8); opacity: 0; }
+  }
+
+  /* Bottom actions */
+  .bottom-actions { display: flex; gap: 8px; padding: 10px 16px 16px; background: linear-gradient(0deg, var(--bg) 60%, transparent); position: sticky; bottom: 0; }
+  .ride-btn { flex: 2; height: 44px; font-size: 16px; border: none; border-radius: 25px; background: linear-gradient(135deg, var(--accent), #38b2ac); color: #0a1628; font-weight: 600; cursor: pointer; }
+  .quest-btn { flex: 1; height: 44px; font-size: 14px; border: 1px solid var(--border); border-radius: 25px; background: var(--bg-card); color: var(--text); cursor: pointer; }
+  .profile-btn { width: 44px; height: 44px; font-size: 18px; border: 1px solid var(--border); border-radius: 25px; background: var(--bg-card); cursor: pointer; flex-shrink: 0; }
+
+  /* ========== FIRE ANIMATION ========== */
+  @keyframes fireGlow {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    25% { transform: scale(1.15) translateY(-3px); filter: brightness(1.3); }
+    50% { transform: scale(1.05) translateY(-1px); filter: brightness(1.1); }
+    75% { transform: scale(1.2) translateY(-5px); filter: brightness(1.4); }
+  }
+  @keyframes fireAura {
+    0%, 100% { box-shadow: 0 0 6px rgba(246, 173, 85, 0.3); }
+    50% { box-shadow: 0 0 16px rgba(246, 173, 85, 0.6), 0 0 32px rgba(246, 173, 85, 0.2); }
+  }
+
+  /* Quest panel overlay */
+  .quest-panel-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 10;
+  }
+  .quest-sheet-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: #111c30;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    padding-bottom: 40px;
+    z-index: 11;
+    animation: slideUp 0.3s ease-out;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+  .quest-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .quest-title { font-size: 18px; font-weight: 700; }
+
+  .quest-streak { display: flex; align-items: center; gap: 4px; background: rgba(246, 173, 85, 0.25); padding: 4px 12px; border-radius: 14px; border: 1px solid rgba(246, 173, 85, 0.3); }
+  .streak-fire-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+  .streak-fire { font-size: 16px; animation: fireGlow 1.2s ease-in-out infinite; }
+  .streak-fire-aura { position: absolute; top: -6px; left: -6px; right: -6px; bottom: -6px; border-radius: 50%; background: radial-gradient(circle, rgba(246, 173, 85, 0.2), transparent); animation: fireAura 2s ease-in-out infinite; }
+  .streak-num { font-size: 13px; color: var(--accent2); font-weight: 600; }
+
+  .quest-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 10px; background: var(--bg-card); border-radius: 12px; margin-bottom: 8px; }
+  .quest-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+  .diff-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+  .diff-1 { background: rgba(104,211,145,0.15); color: #68d391; }
+  .diff-2 { background: rgba(79,209,197,0.15); color: var(--accent); }
+  .diff-3 { background: rgba(252,129,129,0.15); color: var(--danger); }
+  .quest-name { font-size: 13px; font-weight: 600; }
+  .quest-desc { font-size: 10px; color: var(--text-muted); }
+  .quest-progress-bar { width: 100%; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+  .quest-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+  .quest-progress-text { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+  .quest-reward { font-size: 12px; color: var(--accent2); font-weight: 600; }
+  .quest-claim { padding: 4px 12px; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #38b2ac); color: #0a1628; font-size: 11px; font-weight: 600; border: none; cursor: pointer; }
+
+  /* ========== RIDING PAGE ========== */
+  .riding-page { display: flex; flex-direction: column; height: 100%; background: var(--bg); }
+
+  .scene-area { position: relative; width: 100%; height: 35%; background: linear-gradient(180deg, #1a365d 0%, #2d3748 60%, #4a5568 100%); overflow: hidden; }
+  .sky { position: absolute; top: 0; left: 0; width: 100%; height: 60%; }
+  .cloud { position: absolute; font-size: 36px; opacity: 0.4; }
+  .cloud-1 { top: 20%; left: 80%; animation: cloudMove 12s linear infinite; }
+  .cloud-2 { top: 35%; left: 60%; animation: cloudMove 18s linear infinite; animation-delay: -6s; font-size: 28px; }
+  @keyframes cloudMove { 0% { transform: translateX(0); } 100% { transform: translateX(-120vw); } }
+  .terrain-desc { position: absolute; top: 12px; left: 16px; font-size: 12px; color: rgba(255,255,255,0.5); z-index: 5; }
+  .road-area { position: absolute; bottom: 0; left: 0; width: 100%; height: 40%; background: #2d3748; }
+  .road-lines { position: absolute; top: 50%; left: 0; width: 200%; display: flex; gap: 20px; animation: roadScroll 1s linear infinite; }
+  .road-line { width: 40px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; flex-shrink: 0; }
+  @keyframes roadScroll { 0% { transform: translateX(0) translateY(-50%); } 100% { transform: translateX(-60px) translateY(-50%); } }
+  .rider-sprite { position: absolute; bottom: 40%; left: 30%; z-index: 10; animation: riderBounce 0.4s ease-in-out infinite; }
+  .rider-emoji { font-size: 48px; }
+  @keyframes riderBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  .km-display { display: flex; align-items: baseline; justify-content: center; padding: 20px 0 10px; }
+  .km-number { font-size: 56px; font-weight: 800; color: var(--accent); letter-spacing: -1px; }
+  .km-unit { font-size: 20px; color: var(--text-muted); margin-left: 4px; }
+
+  .progress-area { padding: 0 24px; margin-bottom: 16px; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .progress-bar-wrap { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; }
+  .progress-km { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Confetti */
+  .confetti-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 100; overflow: hidden; }
+  .confetti-piece { position: absolute; width: 8px; height: 8px; border-radius: 2px; top: -10px; }
+  .confetti-piece.c1 { left: 15%; background: #fc8181; animation: confettiFall 2.5s ease-in 0.1s infinite; }
+  .confetti-piece.c2 { left: 30%; background: #68d391; animation: confettiFallLeft 2.8s ease-in 0.3s infinite; }
+  .confetti-piece.c3 { left: 45%; background: #4fd1c5; animation: confettiFallRight 2.3s ease-in 0s infinite; }
+  .confetti-piece.c4 { left: 55%; background: #f6ad55; animation: confettiFall 3s ease-in 0.5s infinite; }
+  .confetti-piece.c5 { left: 65%; background: #b794f4; animation: confettiFallLeft 2.6s ease-in 0.2s infinite; }
+  .confetti-piece.c6 { left: 75%; background: #f6e05e; animation: confettiFallRight 2.4s ease-in 0.4s infinite; }
+  .confetti-piece.c7 { left: 85%; background: #63b3ed; animation: confettiFall 2.7s ease-in 0.15s infinite; }
+  .confetti-piece.c8 { left: 25%; background: #fc8181; animation: confettiFallRight 2.9s ease-in 0.35s infinite; }
+
+  @keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(200px) rotate(720deg); opacity: 0; } }
+  @keyframes confettiFallLeft { 0% { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(200px) translateX(-40px) rotate(540deg); opacity: 0; } }
+  @keyframes confettiFallRight { 0% { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(200px) translateX(40px) rotate(900deg); opacity: 0; } }
+  @keyframes celebrateBounce { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.15); opacity: 1; } 70% { transform: scale(0.95); } 100% { transform: scale(1); opacity: 1; } }
+
+  .settle-card { display: flex; flex-direction: column; align-items: center; margin: 10px 16px; padding: 30px 16px; background: var(--bg-card); border-radius: 20px; backdrop-filter: blur(10px); animation: celebrateBounce 0.5s ease-out; }
+  .settle-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 16px; }
+  .settle-icon { font-size: 48px; margin-bottom: 8px; }
+  .settle-title { font-size: 24px; font-weight: 700; }
+  .new-station-name { font-size: 22px; color: var(--accent); font-weight: 600; margin-bottom: 16px; }
+  .settle-stats { width: 100%; margin-bottom: 20px; }
+  .settle-row { display: flex; justify-content: space-between; padding: 10px 14px; font-size: 14px; border-bottom: 1px solid var(--border); }
+  .settle-row:last-child { border-bottom: none; }
+  .text-accent { color: var(--accent); }
+  .text-accent2 { color: var(--accent2); }
+  .text-danger { color: var(--danger); }
+
+  .special-event-text { color: var(--accent2); font-weight: 600; }
+
+  .settle-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .settle-actions .btn { width: 100%; height: 44px; border-radius: 25px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; }
+  .btn-warning { background: linear-gradient(135deg, var(--accent2), #ed8936); color: #0a1628; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #38b2ac); color: #0a1628; }
+  .btn-ghost { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
+
+  /* ========== ACHIEVEMENT MODAL ========== */
+  .ach-modal { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 200; }
+  .ach-card { position: relative; display: flex; flex-direction: column; align-items: center; width: 280px; background: linear-gradient(180deg, #2d1b4e 0%, #111c30 100%); border-radius: 20px; padding: 40px 24px 24px; border: 1px solid rgba(183, 148, 244, 0.3); animation: popIn 0.3s ease-out; overflow: hidden; }
+  @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .ach-glow { position: absolute; top: 50%; left: 50%; width: 120px; height: 120px; margin-top: -60px; margin-left: -60px; border-radius: 50%; background: radial-gradient(circle, rgba(183, 148, 244, 0.4), transparent 70%); animation: goldenGlow 2s ease-out infinite; pointer-events: none; }
+  @keyframes goldenGlow { 0% { transform: scale(0.6); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
+
+  .ach-stars { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; }
+  .ach-star { position: absolute; font-size: 11px; color: #f6e05e; opacity: 0; }
+  .ach-star.s1 { top: 15%; left: 10%; animation: starTwinkle 1.5s ease-in-out 0s infinite; }
+  .ach-star.s2 { top: 20%; right: 12%; animation: starTwinkle 1.8s ease-in-out 0.4s infinite; }
+  .ach-star.s3 { bottom: 25%; left: 8%; animation: starTwinkle 2s ease-in-out 0.8s infinite; }
+  .ach-star.s4 { bottom: 20%; right: 10%; animation: starTwinkle 1.6s ease-in-out 1.2s infinite; }
+  @keyframes starTwinkle { 0%, 100% { opacity: 0; transform: scale(0); } 50% { opacity: 1; transform: scale(1); } }
+
+  .ach-sparkle { position: absolute; top: 12px; right: 14px; font-size: 24px; animation: sparkle 1.5s ease-in-out infinite; }
+  @keyframes sparkle { 0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } 50% { opacity: 0.6; transform: scale(1.2) rotate(15deg); } }
+  .ach-big-icon { font-size: 60px; margin-bottom: 12px; z-index: 1; position: relative; }
+  .ach-label { font-size: 13px; color: #b794f4; font-weight: 600; margin-bottom: 4px; z-index: 1; position: relative; }
+  .ach-name { font-size: 22px; font-weight: 700; margin-bottom: 20px; z-index: 1; position: relative; }
+  .ach-dismiss-btn { width: 100%; height: 40px; font-size: 15px; background: linear-gradient(135deg, #b794f4, #805ad5); color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; z-index: 1; position: relative; }
+
+  /* ========== STATION PAGE ========== */
+  .station-page { padding: 16px; }
+  .close-btn { text-align: right; font-size: 18px; color: var(--text-muted); margin-bottom: 8px; cursor: pointer; }
+  .station-header { text-align: center; margin-bottom: 16px; }
+  .station-icon-wrap { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(79,209,197,0.13) 0%, transparent 70%); }
+  .station-icon { font-size: 30px; }
+  .station-name { font-size: 22px; font-weight: 700; }
+  .station-meta { display: flex; justify-content: center; gap: 16px; margin-top: 6px; font-size: 12px; color: var(--text-muted); }
+  .meta-item { display: flex; align-items: center; gap: 4px; }
+
+  .card { background: var(--bg-card); border-radius: 14px; padding: 14px; margin-bottom: 12px; backdrop-filter: blur(10px); }
+  .desc-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .desc-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+  .desc-event { font-size: 12px; color: var(--text); margin-top: 8px; }
+  .event-label { font-weight: 600; color: var(--accent); }
+
+  .special-section { cursor: pointer; border: 1px solid rgba(246, 173, 85, 0.2); }
+  .special-inner { display: flex; align-items: center; gap: 10px; }
+  .special-icon { font-size: 22px; }
+  .special-info { flex: 1; }
+  .special-title { font-size: 14px; font-weight: 600; color: var(--accent2); }
+  .special-hint { font-size: 11px; color: var(--text-muted); }
+  .special-arrow { font-size: 20px; color: var(--text-muted); }
+
+  .section-header { margin-bottom: 10px; }
+  .section-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .rider-list .rider-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+  .rider-emoji { font-size: 20px; }
+  .rider-name { font-size: 13px; font-weight: 600; }
+  .rider-title { font-size: 11px; color: var(--text-muted); }
+  .rider-km { font-size: 13px; color: var(--accent); margin-left: auto; }
+
+  .shop-section { cursor: pointer; border: 1px solid rgba(79,209,197,0.15); }
+  .shop-inner { display: flex; align-items: center; gap: 10px; }
+  .shop-icon { font-size: 22px; }
+  .shop-info { flex: 1; }
+  .shop-title { font-size: 14px; font-weight: 600; }
+  .shop-hint { font-size: 11px; color: var(--accent2); }
+
+  .shop-list { animation: fadeIn 0.3s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .shop-list-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); }
+  .shop-item { display: flex; align-items: center; justify-content: space-between; }
+  .shop-item-left { display: flex; align-items: center; gap: 8px; }
+  .shop-item-icon { font-size: 20px; }
+  .shop-item-name { font-size: 13px; font-weight: 600; }
+  .shop-item-desc { font-size: 10px; color: var(--text-muted); }
+  .buy-btn { padding: 4px 14px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), #38b2ac); color: #0a1628; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+  .owned-btn { padding: 4px 14px; border-radius: 12px; background: var(--bg-card); color: var(--text-muted); font-size: 12px; border: 1px solid var(--border); cursor: pointer; }
+
+  /* ========== PROFILE PAGE ========== */
+  .profile-page { padding: 16px; overflow-y: auto; height: 100%; }
+  .user-card { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .avatar-placeholder { width: 56px; height: 56px; border-radius: 50%; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .nickname { font-size: 18px; font-weight: 700; }
+  .title-badge { display: inline-block; padding: 2px 10px; border-radius: 10px; border: 1px solid var(--accent); font-size: 11px; color: var(--accent); margin-top: 2px; }
+  .streak-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(246,173,85,0.2); padding: 2px 10px; border-radius: 10px; margin-top: 4px; }
+  .streak-badge .streak-fire { font-size: 14px; animation: fireGlow 1.2s ease-in-out infinite; }
+
+  .section { margin-bottom: 18px; }
+  .section-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stats-item { background: var(--bg-card); border-radius: 10px; padding: 10px; text-align: center; }
+  .stats-num { font-size: 18px; font-weight: 700; }
+  .stats-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .coin-color { color: var(--accent2); }
+
+  /* ========== SPECIAL EVENT PAGE ========== */
+  .spe-page { padding: 16px; text-align: center; padding-top: 40px; }
+  .spe-close { text-align: right; font-size: 18px; color: var(--text-muted); cursor: pointer; }
+  .spe-header { margin-bottom: 12px; }
+  .spe-big-icon { font-size: 56px; }
+  .spe-type-tag { display: inline-block; padding: 2px 12px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-top: 6px; }
+  .type-story { background: rgba(99,179,237,0.15); color: #63b3ed; }
+  .type-challenge { background: rgba(252,129,129,0.15); color: var(--danger); }
+  .type-celebration { background: rgba(246,173,85,0.15); color: var(--accent2); }
+  .spe-name { font-size: 22px; font-weight: 700; margin-bottom: 14px; }
+  .spe-story { text-align: left; font-size: 13px; line-height: 1.8; color: var(--text); }
+  .spe-choices-title { font-size: 14px; font-weight: 600; text-align: left; margin-bottom: 10px; }
+  .spe-choice { display: flex; gap: 10px; padding: 12px; background: var(--bg-card); border-radius: 12px; margin-bottom: 8px; text-align: left; cursor: pointer; border: 1px solid transparent; transition: border-color 0.2s; }
+  .spe-choice.selected { border-color: var(--accent); }
+  .choice-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .choice-radio-inner { width: 10px; height: 10px; border-radius: 50%; }
+  .choice-radio-inner.active { background: var(--accent); }
+  .choice-text { font-size: 13px; font-weight: 600; }
+  .choice-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .choice-penalty { font-size: 11px; color: var(--danger); margin-top: 4px; }
+  .spe-reward-preview { text-align: left; }
+  .reward-preview-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .reward-preview-items { font-size: 13px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .spe-confirm { width: 100%; height: 48px; border-radius: 25px; font-size: 16px; font-weight: 600; border: none; cursor: pointer; margin-top: 16px; background: linear-gradient(135deg, var(--accent), #38b2ac); color: #0a1628; }
+
+  /* ========== PHASE 6 BADGES ========== */
+  .phase6-badge { display: inline-block; padding: 3px 10px; border-radius: 8px; font-size: 10px; font-weight: 600; margin-left: 6px; }
+  .badge-new { background: rgba(104,211,145,0.2); color: #68d391; }
+
+  /* Highlight new features */
+  .highlight-ring { box-shadow: 0 0 0 2px var(--success), 0 0 12px rgba(104,211,145,0.3); }
+</style>
+</head>
+<body>
+
+<div class="preview-shell">
+  <div class="preview-title">滇藏骑行 - 完整预览</div>
+  <div class="preview-subtitle">Phase 1-6 全部完成 | 7个页面 + 5个小游戏 + 社交强化动画</div>
+
+  <div class="phone-grid">
+
+    <!-- ===== 1. MAP PAGE ===== -->
+    <div>
+      <div class="phone-label">1. 地图页 (map) <span class="phase6-badge badge-new">NEW 火焰+脉冲</span></div>
+      <div class="phone-frame">
+        <div class="phone-content">
+          <div class="map-page">
+            <div class="weather-bar">
+              <div class="weather-info">
+                <span class="weather-icon">☀️</span>
+                <span class="weather-name">晴天</span>
+                <span class="weather-desc">万里无云</span>
+              </div>
+              <div><span class="cost-badge">消耗 x1.0</span></div>
+            </div>
+            <div class="status-bar">
+              <div class="status-row">
+                <div class="status-item"><span class="status-label">Day</span><span class="status-value">5</span></div>
+                <div class="status-item location"><span class="status-label">📍</span><span class="status-value">香格里拉</span></div>
+                <div class="status-item"><span class="status-label">海拔</span><span class="status-value">3300m</span></div>
+              </div>
+            </div>
+            <div class="stats-bar">
+              <div class="stat-card"><span class="stat-icon">⚡</span><div class="stat-info"><div class="stat-label">体能</div><div class="stat-bar-wrap"><div class="stat-bar-fill energy" style="width:65%"></div></div><div class="stat-num">130/200</div></div></div>
+              <div class="stat-card"><span class="stat-icon">🛤️</span><div class="stat-info"><div class="stat-label">已骑行</div><div class="stat-num highlight">320 km</div></div></div>
+              <div class="stat-card"><span class="stat-icon">😊</span><div class="stat-info"><div class="stat-label">心情</div><div class="stat-bar-wrap"><div class="stat-bar-fill mood" style="width:80%"></div></div><div class="stat-num">80</div></div></div>
+              <div class="stat-card"><span class="stat-icon">🪙</span><div class="stat-info"><div class="stat-label">金币</div><div class="stat-num coin-text">128</div></div></div>
+            </div>
+            <div class="route-scroll">
+              <div class="route-line">
+                <!-- Passed station -->
+                <div class="station-node passed">
+                  <div class="connector active"><div class="connector-fill" style="height:100%"></div></div>
+                  <div class="node-dot dot-active"><span class="node-icon">🏁</span></div>
+                  <div class="node-info"><div class="node-name">大理古城</div><div class="node-meta"><span class="node-km">0 km</span><span class="node-elev">↑1900m</span></div><div class="rider-bubbles"><div class="bubble-avatars"><span class="bubble-emoji">🚴</span><span class="bubble-emoji">🚴</span></div><span class="bubble-count">3人在此</span></div></div>
+                </div>
+                <!-- Passed station -->
+                <div class="station-node passed">
+                  <div class="connector active"><div class="connector-fill" style="height:100%"></div></div>
+                  <div class="node-dot dot-active"><span class="node-icon">🏔</span></div>
+                  <div class="node-info"><div class="node-name">丽江</div><div class="node-meta"><span class="node-km">180 km</span><span class="node-elev">↑2400m</span></div></div>
+                </div>
+                <!-- Current station -->
+                <div class="station-node current">
+                  <div class="connector active"><div class="connector-fill" style="height:100%"></div></div>
+                  <div class="node-dot dot-active">
+                    <span class="node-icon">🙏</span>
+                    <div class="rider-pulse"></div>
+                  </div>
+                  <div class="node-info"><div class="node-name">香格里拉</div><div class="node-meta"><span class="node-km">320 km</span><span class="node-elev">↑3300m</span></div><div class="rider-bubbles"><div class="bubble-avatars"><span class="bubble-emoji">🚴</span></div><span class="bubble-count">1人在此</span></div></div>
+                </div>
+                <!-- Future stations -->
+                <div class="station-node future">
+                  <div class="connector"><div class="connector-fill" style="height:0%"></div></div>
+                  <div class="node-dot"><span class="node-icon">❄️</span></div>
+                  <div class="node-info"><div class="node-name">德钦（梅里）</div><div class="node-meta"><span class="node-km">480 km</span><span class="node-elev">↑3400m</span></div></div>
+                </div>
+                <div class="station-node future">
+                  <div class="connector"><div class="connector-fill" style="height:0%"></div></div>
+                  <div class="node-dot"><span class="node-icon">🧂</span></div>
+                  <div class="node-info"><div class="node-name">盐井</div><div class="node-meta"><span class="node-km">560 km</span><span class="node-elev">↑2400m</span></div></div>
+                </div>
+                <div class="station-node future">
+                  <div class="connector"><div class="connector-fill" style="height:0%"></div></div>
+                  <div class="node-dot"><span class="node-icon">🔀</span></div>
+                  <div class="node-info"><div class="node-name">芒康</div><div class="node-meta"><span class="node-km">660 km</span><span class="node-elev">↑3870m</span></div></div>
+                </div>
+                <div class="station-node future">
+                  <div class="connector"><div class="connector-fill" style="height:0%"></div></div>
+                  <div class="node-dot"><span class="node-icon">⚠️</span></div>
+                  <div class="node-info"><div class="node-name">通麦天险</div><div class="node-meta"><span class="node-km">1160 km</span><span class="node-elev">↑2000m</span></div></div>
+                </div>
+                <div class="station-node future">
+                  <div class="connector"><div class="connector-fill" style="height:0%"></div></div>
+                  <div class="node-dot"><span class="node-icon">🏆</span></div>
+                  <div class="node-info"><div class="node-name">拉萨</div><div class="node-meta"><span class="node-km">2100 km</span><span class="node-elev">↑3650m</span></div></div>
+                </div>
+              </div>
+            </div>
+            <!-- Quest panel overlay -->
+            <div class="quest-panel-overlay"></div>
+            <div class="quest-sheet-overlay">
+              <div class="quest-header">
+                <span class="quest-title">📋 每日任务</span>
+                <div class="quest-streak">
+                  <div class="streak-fire-wrap">
+                    <span class="streak-fire">🔥</span>
+                    <div class="streak-fire-aura"></div>
+                  </div>
+                  <span class="streak-num">连续5天</span>
+                </div>
+              </div>
+              <div class="quest-item">
+                <div class="quest-left">
+                  <span class="diff-tag diff-1">简单</span>
+                  <div><div class="quest-name">步行6000步</div><div class="quest-desc">转换60体能</div><div class="quest-progress-bar"><div class="quest-progress-fill" style="width:100%"></div></div><div class="quest-progress-text">8000/6000</div></div>
+                </div>
+                <div><div class="quest-reward">+20🪙</div><button class="quest-claim">领取</button></div>
+              </div>
+              <div class="quest-item">
+                <div class="quest-left">
+                  <span class="diff-tag diff-2">普通</span>
+                  <div><div class="quest-name">骑行50km</div><div class="quest-desc">完成一次长途骑行</div><div class="quest-progress-bar"><div class="quest-progress-fill" style="width:60%"></div></div><div class="quest-progress-text">30/50</div></div>
+                </div>
+                <div><div class="quest-reward">+35🪙</div></div>
+              </div>
+              <div class="quest-item">
+                <div class="quest-left">
+                  <span class="diff-tag diff-3">挑战</span>
+                  <div><div class="quest-name">到达新站点</div><div class="quest-desc">探索未知路线</div><div class="quest-progress-bar"><div class="quest-progress-fill" style="width:0%"></div></div><div class="quest-progress-text">0/1</div></div>
+                </div>
+                <div><div class="quest-reward">+50🪙</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 2. RIDING PAGE (with confetti) ===== -->
+    <div>
+      <div class="phone-label">2. 骑行结算页 (riding) <span class="phase6-badge badge-new">NEW 五彩纸屑</span></div>
+      <div class="phone-frame">
+        <div class="phone-content">
+          <div class="riding-page" style="position: relative;">
+            <div class="confetti-container">
+              <div class="confetti-piece c1"></div>
+              <div class="confetti-piece c2"></div>
+              <div class="confetti-piece c3"></div>
+              <div class="confetti-piece c4"></div>
+              <div class="confetti-piece c5"></div>
+              <div class="confetti-piece c6"></div>
+              <div class="confetti-piece c7"></div>
+              <div class="confetti-piece c8"></div>
+            </div>
+            <div class="scene-area">
+              <div class="sky">
+                <div class="cloud cloud-1">☁️</div>
+                <div class="cloud cloud-2">⛅</div>
+              </div>
+              <div class="terrain-desc">🏔 高原峡谷</div>
+              <div class="road-area">
+                <div class="road-lines">
+                  <div class="road-line"></div><div class="road-line"></div><div class="road-line"></div>
+                  <div class="road-line"></div><div class="road-line"></div><div class="road-line"></div>
+                </div>
+                <div class="rider-sprite"><span class="rider-emoji">🚴</span></div>
+              </div>
+            </div>
+            <div class="km-display">
+              <div class="km-number">48</div>
+              <div class="km-unit">km</div>
+            </div>
+            <div class="progress-area">
+              <div class="progress-labels"><span>香格里拉</span><span>德钦</span></div>
+              <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:100%"></div></div>
+              <div class="progress-km"><span>160 / 160 km</span></div>
+            </div>
+            <div class="settle-card">
+              <div class="settle-header">
+                <span class="settle-icon">🎉</span>
+                <span class="settle-title">到达新站点！</span>
+              </div>
+              <div class="new-station-name">❄️ 德钦（梅里）</div>
+              <div class="settle-stats">
+                <div class="settle-row"><span>本次骑行</span><span class="text-accent">+160 km</span></div>
+                <div class="settle-row"><span>体能消耗</span><span class="text-danger">-65</span></div>
+                <div class="settle-row"><span>剩余体能</span><span>65/200</span></div>
+                <div class="settle-row"><span>金币收入</span><span class="text-accent2">+30 🪙</span></div>
+                <div class="settle-row"><span>特色事件</span><span class="special-event-text">🌄 梅里日照金山</span></div>
+              </div>
+              <div class="settle-actions">
+                <button class="btn-warning" style="width:100%;height:44px;border-radius:22px;font-size:15px;font-weight:600;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent2),#ed8936);color:#0a1628;">🌄 梅里日照金山</button>
+                <button class="btn-ghost" style="width:100%;height:44px;border-radius:22px;font-size:15px;font-weight:600;cursor:pointer;background:var(--bg-card);color:var(--text);border:1px solid var(--border);">返回地图</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 3. ACHIEVEMENT MODAL ===== -->
+    <div>
+      <div class="phone-label">3. 成就解锁 <span class="phase6-badge badge-new">NEW 光晕+星光</span></div>
+      <div class="phone-frame" style="background: linear-gradient(180deg, #1a2744 0%, #0a1628 100%);">
+        <div class="phone-content" style="display:flex;align-items:center;justify-content:center;">
+          <div class="ach-modal" style="position:relative;width:100%;height:100%;">
+            <div class="ach-card">
+              <div class="ach-glow"></div>
+              <div class="ach-stars">
+                <div class="ach-star s1">⭐</div>
+                <div class="ach-star s2">✦</div>
+                <div class="ach-star s3">⭐</div>
+                <div class="ach-star s4">✦</div>
+              </div>
+              <div class="ach-sparkle">✨</div>
+              <div class="ach-big-icon">🏔️</div>
+              <div class="ach-label">成就解锁</div>
+              <div class="ach-name">高原勇士</div>
+              <button class="ach-dismiss-btn">太棒了！</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 4. STATION PAGE ===== -->
+    <div>
+      <div class="phone-label">4. 站点详情页 (station)</div>
+      <div class="phone-frame">
+        <div class="phone-content">
+          <div class="station-page">
+            <div class="close-btn">✕</div>
+            <div class="station-header">
+              <div class="station-icon-wrap"><span class="station-icon">❄️</span></div>
+              <div class="station-name">德钦（梅里）</div>
+              <div class="station-meta">
+                <div class="meta-item"><span>📍</span><span>480 km</span></div>
+                <div class="meta-item"><span>⛰️</span><span>海拔 3400m</span></div>
+                <div class="meta-item"><span>⚠️</span><span>危险等级 2</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="desc-title">站点介绍</div>
+              <div class="desc-text">梅里雪山祈福，天气变幻莫测。能否看到日照金山？</div>
+              <div class="desc-event"><span class="event-label">路况特征：</span><span>天气突变</span></div>
+            </div>
+            <div class="special-section card highlight-ring">
+              <div class="special-inner">
+                <span class="special-icon">🌄</span>
+                <div class="special-info">
+                  <div class="special-title">梅里日照金山</div>
+                  <div class="special-hint">特色事件 · 剧情分支</div>
+                </div>
+                <span class="special-arrow">›</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="section-header"><span class="section-title">🚴 骑友 (2)</span></div>
+              <div class="rider-list">
+                <div class="rider-item">
+                  <span class="rider-emoji">🚴</span>
+                  <div><div class="rider-name">骑行侠客</div><div class="rider-title">🏔️ 高原行者</div></div>
+                  <div class="rider-km">478 km</div>
+                </div>
+                <div class="rider-item">
+                  <span class="rider-emoji">🚴</span>
+                  <div><div class="rider-name">追风少年</div><div class="rider-title">⚡ 新手骑手</div></div>
+                  <div class="rider-km">320 km</div>
+                </div>
+              </div>
+            </div>
+            <div class="shop-section card">
+              <div class="shop-inner">
+                <span class="shop-icon">🛒</span>
+                <div class="shop-info">
+                  <div class="shop-title">补给商店</div>
+                  <div class="shop-hint">金币余额: 128 🪙</div>
+                </div>
+                <span>›</span>
+              </div>
+            </div>
+            <div class="shop-list">
+              <div class="shop-list-title">可购买商品</div>
+              <div class="shop-item card">
+                <div class="shop-item-left">
+                  <span class="shop-item-icon">🫁</span>
+                  <div><div class="shop-item-name">氧气瓶</div><div class="shop-item-desc">+50体能, 缓解高反</div></div>
+                </div>
+                <button class="buy-btn">40🪙</button>
+              </div>
+              <div class="shop-item card">
+                <div class="shop-item-left">
+                  <span class="shop-item-icon">🧣</span>
+                  <div><div class="shop-item-name">保暖衣物</div><div class="shop-item-desc">+20%高反适应, 免疫雪天</div></div>
+                </div>
+                <button class="owned-btn">已拥有</button>
+              </div>
+              <div class="shop-item card">
+                <div class="shop-item-left">
+                  <span class="shop-item-icon">🍞</span>
+                  <div><div class="shop-item-name">糌粑</div><div class="shop-item-desc">+30体能, +10心情</div></div>
+                </div>
+                <button class="buy-btn">35🪙</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 5. SPECIAL EVENT PAGE ===== -->
+    <div>
+      <div class="phone-label">5. 特色事件页 (special-event)</div>
+      <div class="phone-frame">
+        <div class="phone-content">
+          <div class="spe-page">
+            <div class="spe-header">
+              <div class="spe-big-icon">🌄</div>
+              <div class="spe-type-tag type-story">故事</div>
+            </div>
+            <div class="spe-name">梅里日照金山</div>
+            <div class="card spe-story">
+              凌晨四点，你在德钦的客栈里被冻醒。推开窗户，夜空中繁星点点。按照当地人的说法，今天运气好的话，日出时分梅里雪山的卡瓦格博主峰会变成金色...
+            </div>
+            <div class="spe-choices-title">你的选择</div>
+            <div class="spe-choice selected">
+              <div class="choice-radio"><div class="choice-radio-inner active"></div></div>
+              <div>
+                <div class="choice-text">早起去飞来寺观景台等候</div>
+                <div class="choice-desc">虔诚地等待日照金山的奇景</div>
+              </div>
+            </div>
+            <div class="spe-choice">
+              <div class="choice-radio"><div class="choice-radio-inner"></div></div>
+              <div>
+                <div class="choice-text">在客栈多睡一会儿</div>
+                <div class="choice-desc">保持体力，今天还要翻山</div>
+              </div>
+            </div>
+            <div class="spe-choice">
+              <div class="choice-radio"><div class="choice-radio-inner"></div></div>
+              <div>
+                <div class="choice-text">翻越垭口，边骑边看</div>
+                <div class="choice-desc">在骑行中欣赏雪山全景</div>
+                <div class="choice-penalty">⚡-15 体能消耗增加</div>
+              </div>
+            </div>
+            <div class="card spe-reward-preview">
+              <div class="reward-preview-title">基础奖励</div>
+              <div class="reward-preview-items">
+                <span>🪙+40</span>
+                <span>😊+15</span>
+                <span>🎖日照猎人</span>
+              </div>
+            </div>
+            <button class="spe-confirm">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 6. PROFILE PAGE ===== -->
+    <div>
+      <div class="phone-label">6. 个人中心 (profile)</div>
+      <div class="phone-frame">
+        <div class="phone-content">
+          <div class="profile-page">
+            <div class="user-card">
+              <div class="avatar-placeholder">🚴</div>
+              <div>
+                <div class="nickname">骑行者</div>
+                <div class="title-badge">🏔️ 高原行者</div>
+                <div class="streak-badge">
+                  <span class="streak-fire">🔥</span>
+                  <span>连续 5 天</span>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-title">数据统计</div>
+              <div class="stats-grid">
+                <div class="stats-item"><div class="stats-num text-accent">480</div><div class="stats-label">总里程 (km)</div></div>
+                <div class="stats-item"><div class="stats-num text-accent2">5</div><div class="stats-label">骑行天数</div></div>
+                <div class="stats-item"><div class="stats-num" style="color:var(--success)">3</div><div class="stats-label">到达站点</div></div>
+                <div class="stats-item"><div class="stats-num coin-color">158</div><div class="stats-label">金币</div></div>
+                <div class="stats-item"><div class="stats-num" style="color:#b794f4">18%</div><div class="stats-label">高原适应度</div></div>
+                <div class="stats-item"><div class="stats-num" style="color:#63b3ed">85</div><div class="stats-label">储备体能</div></div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-title">已装备</div>
+              <div class="equip-list">
+                <div class="card" style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <span style="font-size:20px;">🚲</span>
+                  <div style="flex:1"><div style="font-size:13px;font-weight:600;">山地车</div><div style="font-size:10px;color:var(--text-muted);">稳定耐操，适合山路</div></div>
+                  <div><div style="width:60px;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;"><div style="height:100%;width:72%;background:var(--accent2);border-radius:2px;"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">72%</div></div>
+                </div>
+                <div class="card" style="display:flex;align-items:center;gap:10px;">
+                  <span style="font-size:20px;">🧣</span>
+                  <div style="flex:1"><div style="font-size:13px;font-weight:600;">保暖衣物</div><div style="font-size:10px;color:var(--text-muted);">+20%高反适应</div></div>
+                  <div><div style="width:60px;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;"><div style="height:100%;width:90%;background:var(--success);border-radius:2px;"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:2px;">90%</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-title">🖼 明信片 (3/14)</div>
+              <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;margin-bottom:10px;">
+                <div style="height:100%;width:21%;background:linear-gradient(90deg,var(--accent),#b794f4);border-radius:3px;"></div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <div style="width:70px;height:90px;border-radius:8px;background:var(--bg-card);border-left:3px solid #68d391;padding:6px;text-align:center;">
+                  <div style="font-size:20px;">🏁</div>
+                  <div style="font-size:9px;color:var(--text);margin-top:4px;">大理古城</div>
+                  <div style="font-size:8px;color:#68d391;">普通</div>
+                </div>
+                <div style="width:70px;height:90px;border-radius:8px;background:var(--bg-card);border-left:3px solid #68d391;padding:6px;text-align:center;">
+                  <div style="font-size:20px;">🏔</div>
+                  <div style="font-size:9px;color:var(--text);margin-top:4px;">丽江</div>
+                  <div style="font-size:8px;color:#68d391;">普通</div>
+                </div>
+                <div style="width:70px;height:90px;border-radius:8px;background:var(--bg-card);border-left:3px solid var(--accent);padding:6px;text-align:center;">
+                  <div style="font-size:20px;">🙏</div>
+                  <div style="font-size:9px;color:var(--text);margin-top:4px;">香格里拉</div>
+                  <div style="font-size:8px;color:var(--accent);">稀有</div>
+                </div>
+                <div style="width:70px;height:90px;border-radius:8px;background:var(--bg-card);border-left:3px solid rgba(255,255,255,0.1);padding:6px;text-align:center;opacity:0.4;">
+                  <div style="font-size:20px;">❓</div>
+                  <div style="font-size:9px;margin-top:4px;">???</div>
+                  <div style="font-size:8px;">???</div>
+                </div>
+                <div style="width:70px;height:90px;border-radius:8px;background:var(--bg-card);border-left:3px solid rgba(255,255,255,0.1);padding:6px;text-align:center;opacity:0.4;">
+                  <div style="font-size:20px;">❓</div>
+                  <div style="font-size:9px;margin-top:4px;">???</div>
+                  <div style="font-size:8px;">???</div>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="section-title">成就 (3/13)</div>
+              <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg-card);border-radius:10px;border:1px solid rgba(183,148,244,0.15);">
+                <span style="font-size:20px;">🏔️</span>
+                <div style="flex:1;"><div style="font-size:13px;font-weight:600;">高原勇士</div><div style="font-size:10px;color:var(--text-muted);">海拔突破3000米</div></div>
+                <div style="text-align:right;"><div style="font-size:10px;color:var(--accent2);">+30🪙</div><div style="font-size:9px;color:#68d391;">已解锁</div></div>
+              </div>
+              <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;padding:10px;background:var(--bg-card);border-radius:10px;opacity:0.5;">
+                <span style="font-size:20px;">🔒</span>
+                <div style="flex:1;"><div style="font-size:13px;font-weight:600;">铁肺骑士</div><div style="font-size:10px;color:var(--text-muted);">???</div></div>
+                <div style="font-size:10px;color:var(--accent2);">+50🪙</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 7. LOGIN REWARD ===== -->
+    <div>
+      <div class="phone-label">7. 登录奖励 <span class="phase6-badge badge-new">NEW 火焰动画</span></div>
+      <div class="phone-frame" style="background: rgba(0,0,0,0.7);">
+        <div class="phone-content" style="display:flex;align-items:center;justify-content:center;">
+          <div style="width:300px;background:linear-gradient(180deg,#1a2744 0%,#111c30 100%);border-radius:20px;padding:30px 20px;border:1px solid rgba(246,173,85,0.2);animation:popIn 0.3s ease-out;text-align:center;">
+            <div style="position:relative;display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
+              <div style="position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:6px;">
+                <span style="font-size:48px;animation:fireGlow 1s ease-in-out infinite;">🔥</span>
+                <div style="position:absolute;top:-10px;left:-10px;right:-10px;bottom:-10px;border-radius:50%;background:radial-gradient(circle,rgba(246,173,85,0.3),transparent);animation:fireAura 1.8s ease-in-out infinite;"></div>
+              </div>
+              <div style="font-size:20px;font-weight:700;color:var(--text);">每日签到</div>
+              <div style="font-size:13px;color:var(--accent2);margin-top:4px;">连续 5 天</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:4px;margin-bottom:18px;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;border-radius:8px;background:var(--bg-card);opacity:0.5;"><div style="font-size:9px;color:var(--text-muted);">Day1</div><div style="font-size:16px;margin:2px 0;">🪙</div><div style="font-size:10px;color:var(--accent2);">10</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;border-radius:8px;background:var(--bg-card);opacity:0.5;"><div style="font-size:9px;color:var(--text-muted);">Day2</div><div style="font-size:16px;margin:2px 0;">🪙</div><div style="font-size:10px;color:var(--accent2);">15</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;border-radius:8px;background:var(--bg-card);opacity:0.5;"><div style="font-size:9px;color:var(--text-muted);">Day3</div><div style="font-size:16px;margin:2px 0;">🪙</div><div style="font-size:10px;color:var(--accent2);">20</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;border-radius:8px;background:var(--bg-card);opacity:0.5;"><div style="font-size:9px;color:var(--text-muted);">Day4</div><div style="font-size:16px;margin:2px 0;">🪙</div><div style="font-size:10px;color:var(--accent2);">25</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;border-radius:8px;background:rgba(246,173,85,0.2);border:1px solid rgba(246,173,85,0.4);"><div style="font-size:9px;color:var(--text-muted);">Day5</div><div style="font-size:16px;margin:2px 0;">🎁</div><div style="font-size:10px;color:var(--accent2);">30</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;border-radius:8px;background:var(--bg-card);"><div style="font-size:9px;color:var(--text-muted);">Day6</div><div style="font-size:16px;margin:2px 0;">🪙</div><div style="font-size:10px;color:var(--accent2);">35</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 4px;border-radius:8px;background:var(--bg-card);"><div style="font-size:9px;color:var(--text-muted);">Day7</div><div style="font-size:16px;margin:2px 0;">🎁</div><div style="font-size:10px;color:var(--accent2);">50</div></div>
+            </div>
+            <div style="background:var(--bg-card);border-radius:12px;padding:14px;margin-bottom:16px;">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">今日奖励</div>
+              <div style="font-size:18px;color:var(--accent2);font-weight:700;">+30 金币</div>
+            </div>
+            <button style="width:100%;height:44px;border-radius:22px;font-size:16px;font-weight:700;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),#38b2ac);color:#0a1628;">领取奖励</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
