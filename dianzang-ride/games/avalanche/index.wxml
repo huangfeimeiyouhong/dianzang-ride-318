@@ -1,0 +1,36 @@
+<!--games/avalanche/index.wxml  雪崩关卡-->
+<view class="game-wrap">
+  <!-- HUD -->
+  <view class="game-hud">
+    <view class="hud-status">
+      <text class="hud-status-label" wx:if="{{phase === 'find'}}">快速找到安全区！</text>
+      <text class="hud-status-label hud-status--hold" wx:elif="{{phase === 'hold'}}">保持不动！ {{holdSec}}s</text>
+      <text class="hud-status-label" wx:else>准备...</text>
+    </view>
+    <view class="hud-timer">{{remainSec}}s</view>
+  </view>
+
+  <!-- 游戏画布 -->
+  <canvas
+    type="2d"
+    id="game-canvas"
+    class="game-canvas"
+    style="width:{{canvasW}}px;height:{{canvasH}}px"
+    bindtouchstart="onTouch"
+  ></canvas>
+
+  <!-- 结算 -->
+  <view class="game-result" wx:if="{{finished}}">
+    <view class="result-icon">{{won ? '⛑️' : '🏔'}}</view>
+    <view class="result-title">{{won ? '安全躲过雪崩！' : '被雪崩吞没...'}}</view>
+    <button class="btn btn-primary result-btn" bindtap="onBack">返回</button>
+  </view>
+
+  <ad-modal
+    show="{{showAd}}"
+    title="被雪崩吞没"
+    penalty="体能 -30"
+    bind:ad="onAdRevive"
+    bind:skip="onAdSkip"
+  />
+</view>

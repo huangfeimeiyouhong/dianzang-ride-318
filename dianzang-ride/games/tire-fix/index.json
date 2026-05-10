@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "ad-modal": "/components/ad-modal/index"
+  }
+}

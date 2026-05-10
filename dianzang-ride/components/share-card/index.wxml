@@ -1,0 +1,9 @@
+<!--components/share-card/index.wxml  分享图生成组件-->
+<view class="share-wrap">
+  <canvas
+    type="2d"
+    id="share-canvas"
+    class="share-canvas"
+    style="width:{{canvasW}}px;height:{{canvasH}}px"
+  ></canvas>
+</view>

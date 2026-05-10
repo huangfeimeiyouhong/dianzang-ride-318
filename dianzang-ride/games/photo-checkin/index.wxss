@@ -1,0 +1,86 @@
+/* 风景打卡游戏样式 */
+.container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: #3498db;
+}
+
+.game-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.status-box {
+  position: absolute;
+  top: 20rpx;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 10;
+}
+
+.timer-text {
+  font-size: 60rpx;
+  font-weight: bold;
+  color: #fff;
+  display: block;
+  text-shadow: 0 4rpx 10rpx rgba(0,0,0,0.3);
+}
+
+.align-hint {
+  font-size: 28rpx;
+  color: #fff;
+  display: block;
+  margin-top: 10rpx;
+  text-shadow: 0 2rpx 5rpx rgba(0,0,0,0.3);
+}
+
+/* 结果弹窗 */
+.result-modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 100;
+}
+
+.result-content {
+  background: #fff; border-radius: 30rpx;
+  padding: 60rpx; text-align: center; min-width: 500rpx;
+}
+
+.result-content.win { border: 5rpx solid #3498db; }
+.result-content.lose { border: 5rpx solid #e74c3c; }
+
+.result-emoji { font-size: 100rpx; display: block; margin-bottom: 20rpx; }
+.result-title { font-size: 40rpx; font-weight: bold; display: block; margin-bottom: 15rpx; }
+.win .result-title { color: #3498db; }
+.lose .result-title { color: #e74c3c; }
+.result-desc { font-size: 28rpx; color: #666; display: block; margin-bottom: 40rpx; }
+.result-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff; border: none; border-radius: 50rpx;
+  padding: 25rpx 80rpx; font-size: 32rpx;
+}
+
+/* 广告弹窗 */
+.ad-modal {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 100;
+}
+
+.ad-content {
+  background: #fff; border-radius: 30rpx;
+  padding: 60rpx; text-align: center; width: 600rpx;
+}
+
+.ad-title { font-size: 36rpx; font-weight: bold; display: block; margin-bottom: 40rpx; }
+.ad-btn {
+  background: #ffd700; color: #333; border: none; border-radius: 50rpx;
+  padding: 25rpx 60rpx; font-size: 30rpx; margin-bottom: 20rpx;
+}
+.skip-btn { background: transparent; color: #999; border: none; font-size: 26rpx; }

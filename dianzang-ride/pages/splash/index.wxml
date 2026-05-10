@@ -1,0 +1,27 @@
+<view class="splash">
+  <!-- 雪山剪影背景 -->
+  <view class="mountain-silhouette">
+    <view class="mountain mountain-1"></view>
+    <view class="mountain mountain-2"></view>
+    <view class="mountain mountain-3"></view>
+    <view class="snow-particles">
+      <view class="particle" wx:for="{{8}}" wx:key="*this"></view>
+    </view>
+  </view>
+
+  <!-- Logo 标题区 -->
+  <view class="logo-area">
+    <view class="logo-icon">🚴‍♂️</view>
+    <view class="title">滇藏骑行</view>
+    <view class="subtitle">大理 → 拉萨</view>
+    <view class="tagline">2100 km · 13 站 · 一段传奇</view>
+  </view>
+
+  <!-- 开始旅程按钮 -->
+  <view class="bottom-area safe-bottom">
+    <button class="btn btn-primary start-btn" bindtap="onStartTap" disabled="{{loading}}">
+      {{loading ? '加载中...' : '开始旅程'}}
+    </button>
+    <view class="version">v1.0.0</view>
+  </view>
+</view>

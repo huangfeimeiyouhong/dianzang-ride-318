@@ -1,0 +1,26 @@
+<!--components/station-card/index.wxml  站点信息卡片-->
+<view class="station-card {{current ? 'station-card--current' : ''}} {{reached ? 'station-card--reached' : ''}}">
+  <!-- 左：站点图标 + 名称 -->
+  <view class="station-left">
+    <view class="station-icon">{{station.icon}}</view>
+    <view class="station-info">
+      <view class="station-name">{{station.name}}</view>
+      <view class="station-meta">
+        <text class="station-km">{{station.km}}km</text>
+        <text class="station-sep">|</text>
+        <text class="station-elev">{{station.elev}}m</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 右：骑友数量气泡 -->
+  <view class="station-right">
+    <view class="rider-bubble" wx:if="{{riderCount > 0}}">
+      <text class="rider-bubble-icon">🚴</text>
+      <text class="rider-bubble-count">{{riderCount}}</text>
+    </view>
+    <!-- 状态标记 -->
+    <view class="station-badge station-badge--current" wx:if="{{current}}">当前</view>
+    <view class="station-badge station-badge--reached" wx:elif="{{reached}}">已达</view>
+  </view>
+</view>

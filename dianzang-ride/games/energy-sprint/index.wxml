@@ -1,0 +1,38 @@
+<view class="container">
+  <!-- 游戏画布 -->
+  <canvas type="2d" id="game-canvas" class="game-canvas" canvas-id="gameCanvas" style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
+
+  <!-- HUD -->
+  <view class="hud">
+    <view class="phase-box">
+      <text class="phase-label">{{phase === 'charge' ? '蓄能' : phase === 'stable' ? '稳态' : '完成'}}</text>
+      <text class="phase-hint">{{phase === 'charge' ? '快速点击！' : '保持能量≥60%！'}}</text>
+    </view>
+    <view class="energy-box">
+      <text class="energy-value">{{energyPct}}%</text>
+      <progress percent="{{energyPct}}" stroke-width="12" activeColor="{{energyPct >= 60 ? '#27ae60' : '#ff6b35'}}" backgroundColor="#1a1a3a" />
+    </view>
+    <view wx:if="{{phase === 'stable'}}" class="timer-box">
+      <text class="timer-value">{{timerSec}}s</text>
+    </view>
+  </view>
+
+  <!-- 结果弹窗 -->
+  <view wx:if="{{finished}}" class="result-modal">
+    <view class="result-content {{won ? 'win' : 'lose'}}">
+      <text class="result-emoji">{{won ? '⚡' : '💤'}}</text>
+      <text class="result-title">{{won ? '能量充沛！' : '体力耗尽...'}}</text>
+      <text class="result-desc">{{won ? '完美冲刺！' : '休息一下再出发'}}</text>
+      <button class="result-btn" bindtap="onBack">返回</button>
+    </view>
+  </view>
+
+  <!-- 广告弹窗 -->
+  <view wx:if="{{showAd}}" class="ad-modal">
+    <view class="ad-content">
+      <text class="ad-title">观看广告复活</text>
+      <button class="ad-btn" bindtap="onAdRevive">观看广告</button>
+      <button class="skip-btn" bindtap="onAdSkip">跳过</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,19 @@
+/* components/rider-avatar/index.wxss  骑手头像组件 */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.avatar--bordered {
+  border-width: 4rpx;
+  border-style: solid;
+}
+
+.avatar-emoji {
+  line-height: 1;
+}

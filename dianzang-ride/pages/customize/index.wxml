@@ -1,0 +1,96 @@
+<view class="customize">
+  <!-- 顶部骑手预览 -->
+  <view class="preview-area">
+    <view class="preview-bg" style="background: radial-gradient(circle, {{selectedColor}}22 0%, transparent 70%);">
+      <view class="preview-emoji">{{bikeEmoji}}</view>
+      <view class="preview-parts">
+        <text class="part-helmet">{{helmetIcon}}</text>
+        <text class="part-jersey">{{jerseyIcon}}</text>
+      </view>
+    </view>
+    <view class="preview-label">你的骑手</view>
+  </view>
+
+  <scroll-view scroll-y class="options-scroll">
+    <!-- 头盔选项 -->
+    <view class="option-section">
+      <view class="section-title">头盔</view>
+      <view class="option-row">
+        <view
+          wx:for="{{helmets}}"
+          wx:key="id"
+          class="option-item {{selectedHelmet === item.id ? 'selected' : ''}} {{item.locked ? 'locked' : ''}}"
+          style="{{selectedHelmet === item.id ? 'border-color:' + selectedColor : ''}}"
+          bindtap="onSelectHelmet"
+          data-id="{{item.id}}"
+        >
+          <text class="option-icon">{{item.icon}}</text>
+          <text class="option-name">{{item.name}}</text>
+          <view wx:if="{{item.locked}}" class="lock-badge">🔒</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 骑行服选项 -->
+    <view class="option-section">
+      <view class="section-title">骑行服</view>
+      <view class="option-row">
+        <view
+          wx:for="{{jerseys}}"
+          wx:key="id"
+          class="option-item {{selectedJersey === item.id ? 'selected' : ''}} {{item.locked ? 'locked' : ''}}"
+          style="{{selectedJersey === item.id ? 'border-color:' + selectedColor : ''}}"
+          bindtap="onSelectJersey"
+          data-id="{{item.id}}"
+        >
+          <text class="option-icon">{{item.icon}}</text>
+          <text class="option-name">{{item.name}}</text>
+          <view wx:if="{{item.locked}}" class="lock-badge">🔒</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 车型选项 -->
+    <view class="option-section">
+      <view class="section-title">车型</view>
+      <view class="option-row">
+        <view
+          wx:for="{{bikes}}"
+          wx:key="id"
+          class="option-item bike-item {{selectedBike === item.id ? 'selected' : ''}} {{item.locked ? 'locked' : ''}}"
+          style="{{selectedBike === item.id ? 'border-color:' + selectedColor : ''}}"
+          bindtap="onSelectBike"
+          data-id="{{item.id}}"
+        >
+          <text class="option-icon">{{item.icon}}</text>
+          <text class="option-name">{{item.name}}</text>
+          <view wx:if="{{item.locked}}" class="lock-badge">🔒</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 主题色选项 -->
+    <view class="option-section">
+      <view class="section-title">主题色</view>
+      <view class="color-row">
+        <view
+          wx:for="{{colors}}"
+          wx:key="*this"
+          class="color-dot {{selectedColor === item ? 'selected' : ''}}"
+          style="background: {{item}}; {{selectedColor === item ? 'box-shadow: 0 0 20rpx ' + item : ''}}"
+          bindtap="onSelectColor"
+          data-color="{{item}}"
+        >
+          <view wx:if="{{selectedColor === item}}" class="color-check">✓</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部出发按钮 -->
+  <view class="bottom-bar safe-bottom">
+    <button class="btn btn-primary go-btn" bindtap="onGoTap">
+      出发！
+    </button>
+  </view>
+</view>

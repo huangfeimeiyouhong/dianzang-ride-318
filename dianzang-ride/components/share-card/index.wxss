@@ -1,0 +1,9 @@
+/* components/share-card/index.wxss  分享图生成组件 */
+.share-wrap {
+  position: relative;
+}
+
+.share-canvas {
+  /* 实际尺寸由 JS 控制，这里仅作容器 */
+  border-radius: 16rpx;
+}

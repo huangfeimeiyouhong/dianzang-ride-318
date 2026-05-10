@@ -1,0 +1,451 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+}
+
+/* ========== 用户卡 ========== */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 48rpx 32rpx 32rpx;
+  padding-top: calc(env(safe-area-inset-top) + 48rpx);
+  background: linear-gradient(180deg, rgba(79, 209, 197, 0.08) 0%, transparent 100%);
+}
+
+.avatar-area {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4rpx solid var(--accent);
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  font-size: 64rpx;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8rpx;
+}
+
+.title-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 20rpx;
+  border: 2rpx solid;
+  border-radius: 20rpx;
+}
+
+.title-text {
+  font-size: 22rpx;
+  color: var(--accent);
+}
+
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  margin-top: 8rpx;
+  background: rgba(246, 173, 85, 0.12);
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+
+.streak-fire {
+  font-size: 22rpx;
+}
+
+.streak-text {
+  font-size: 20rpx;
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+/* ========== 滚动内容 ========== */
+.content-scroll {
+  flex: 1;
+  padding: 0 32rpx;
+}
+
+.section {
+  margin-bottom: 36rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 20rpx;
+}
+
+/* ========== 数据统计 ========== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+
+.stats-grid.stats-grid-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx;
+  background: var(--bg-card);
+  border-radius: 16rpx;
+}
+
+.stats-num {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-label {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+}
+
+.coin-color {
+  color: var(--accent2);
+}
+
+/* ========== 装备列表 ========== */
+.equip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.equip-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.equip-icon {
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.equip-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.equip-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.equip-desc {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 2rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.equip-durability {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4rpx;
+  min-width: 100rpx;
+}
+
+.dura-bar-wrap {
+  width: 80rpx;
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.dura-bar-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  transition: width 0.3s;
+}
+
+.dura-text {
+  font-size: 18rpx;
+  color: var(--text-muted);
+}
+
+/* ========== 背包 ========== */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
+}
+
+.inv-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 8rpx;
+  background: var(--bg-card);
+  border-radius: 16rpx;
+}
+
+.inv-item:active {
+  opacity: 0.85;
+  transform: scale(0.97);
+}
+
+.inv-icon {
+  font-size: 40rpx;
+  margin-bottom: 4rpx;
+}
+
+.inv-count {
+  font-size: 22rpx;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.inv-name {
+  font-size: 18rpx;
+  color: var(--text-muted);
+  margin-top: 2rpx;
+}
+
+/* ========== 成就列表（全部） ========== */
+.achievement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 16rpx;
+  transition: background 0.2s;
+}
+
+.achievement-item.unlocked {
+  background: var(--bg-card);
+}
+
+.achievement-item.locked {
+  background: rgba(255, 255, 255, 0.03);
+  opacity: 0.6;
+}
+
+.ach-icon {
+  font-size: 36rpx;
+  flex-shrink: 0;
+}
+
+.achievement-item.locked .ach-icon {
+  opacity: 0.4;
+}
+
+.ach-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ach-name {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.ach-desc {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 2rpx;
+}
+
+.ach-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4rpx;
+  flex-shrink: 0;
+}
+
+.reward-text {
+  font-size: 18rpx;
+  color: var(--accent2);
+}
+
+.unlocked-tag {
+  font-size: 18rpx;
+  color: var(--success);
+  background: rgba(104, 211, 145, 0.12);
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+/* ========== 明信片画廊 ========== */
+.postcard-progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4rpx;
+  margin-bottom: 20rpx;
+  overflow: hidden;
+}
+
+.postcard-progress-fill {
+  height: 100%;
+  border-radius: 4rpx;
+  transition: width 0.5s ease;
+}
+
+.postcard-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.postcard-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 20rpx;
+  background: var(--bg-card);
+  border-radius: 16rpx;
+  border-left: 4rpx solid transparent;
+}
+
+.postcard-item.locked {
+  opacity: 0.4;
+}
+
+.postcard-emoji-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.postcard-emoji {
+  font-size: 40rpx;
+}
+
+.postcard-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.postcard-title {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.postcard-station {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 2rpx;
+}
+
+.postcard-desc {
+  font-size: 18rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.postcard-rarity {
+  font-size: 20rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ========== 设置 ========== */
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setting-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+}
+
+.setting-icon {
+  font-size: 36rpx;
+}
+
+.setting-info {
+  flex: 1;
+}
+
+.setting-name {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.setting-desc {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 2rpx;
+}
+
+/* ========== 通用 ========== */
+.empty-hint {
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-muted);
+  padding: 40rpx 0;
+}
+
+.footer-space {
+  height: 120rpx;
+}

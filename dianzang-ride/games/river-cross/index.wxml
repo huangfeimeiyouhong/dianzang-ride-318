@@ -1,0 +1,37 @@
+<view class="container">
+  <!-- 游戏画布 -->
+  <canvas type="2d" id="game-canvas" class="game-canvas" canvas-id="gameCanvas" style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
+
+  <!-- HUD -->
+  <view class="hud-top">
+    <view class="hp-box">
+      <text class="hp-label">HP</text>
+      <progress percent="{{hpPct}}" stroke-width="10" activeColor="{{hpPct > 50 ? '#27ae60' : '#e74c3c'}}" backgroundColor="rgba(0,0,0,0.3)" />
+      <text class="hp-value">{{hpPct}}%</text>
+    </view>
+    <view class="dist-box">
+      <text class="dist-label">进度</text>
+      <progress percent="{{distancePct}}" stroke-width="8" activeColor="#3498db" backgroundColor="rgba(0,0,0,0.3)" />
+      <text class="dist-value">{{distance}}m</text>
+    </view>
+  </view>
+
+  <!-- 结果弹窗 -->
+  <view wx:if="{{finished}}" class="result-modal">
+    <view class="result-content {{won ? 'win' : 'lose'}}">
+      <text class="result-emoji">{{won ? '🌊' : '💦'}}</text>
+      <text class="result-title">{{won ? '渡河成功！' : '落水了...'}}</text>
+      <text class="result-desc">{{won ? '安全到达对岸！' : '被水流冲走了'}}</text>
+      <button class="result-btn" bindtap="onBack">返回</button>
+    </view>
+  </view>
+
+  <!-- 广告弹窗 -->
+  <view wx:if="{{showAd}}" class="ad-modal">
+    <view class="ad-content">
+      <text class="ad-title">观看广告复活</text>
+      <button class="ad-btn" bindtap="onAdRevive">观看广告</button>
+      <button class="skip-btn" bindtap="onAdSkip">跳过</button>
+    </view>
+  </view>
+</view>

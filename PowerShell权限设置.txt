@@ -1,0 +1,6 @@
+# 如果 PowerShell 脚本无法运行，先运行此命令
+
+# 以管理员身份打开 PowerShell，然后运行：
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# 然后就可以正常运行 部署到GitHub.ps1 了

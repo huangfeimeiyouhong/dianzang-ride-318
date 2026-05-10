@@ -1,0 +1,113 @@
+<view class="profile-page">
+  <view class="user-card">
+    <view class="avatar-area">
+      <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="avatar-placeholder">🚴</view>
+    </view>
+    <view class="user-info">
+      <view class="nickname">{{nickname}}</view>
+      <view class="title-badge" style="border-color: var(--accent);"><text class="title-text">{{title}}</text></view>
+      <view class="streak-badge" wx:if="{{loginStreak > 0}}">
+        <text class="streak-fire">🔥</text>
+        <text class="streak-text">连续 {{loginStreak}} 天</text>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="content-scroll">
+    <!-- 数据统计 -->
+    <view class="section">
+      <view class="section-title">数据统计</view>
+      <view class="stats-grid">
+        <view class="stats-item"><view class="stats-num text-accent">{{totalKm}}</view><view class="stats-label">总里程 (km)</view></view>
+        <view class="stats-item"><view class="stats-num text-accent2">{{totalDays}}</view><view class="stats-label">骑行天数</view></view>
+        <view class="stats-item"><view class="stats-num" style="color: var(--success);">{{stationsReached}}</view><view class="stats-label">到达站点</view></view>
+        <view class="stats-item"><view class="stats-num coin-color">{{coins}}</view><view class="stats-label">金币</view></view>
+        <view class="stats-item"><view class="stats-num" style="color: #b794f4;">{{altitudeAdapt}}%</view><view class="stats-label">高原适应度</view></view>
+        <view class="stats-item"><view class="stats-num" style="color: #63b3ed;">{{energyReserve}}</view><view class="stats-label">储备体能</view></view>
+      </view>
+    </view>
+
+    <!-- 已装备 -->
+    <view class="section">
+      <view class="section-title">已装备</view>
+      <view wx:if="{{equipment.length > 0}}" class="equip-list">
+        <view wx:for="{{equipment}}" wx:key="id" class="equip-item card">
+          <text class="equip-icon">{{item.icon}}</text>
+          <view class="equip-info"><view class="equip-name">{{item.name}}</view><view class="equip-desc">{{item.desc}}</view></view>
+          <view class="equip-durability">
+            <view class="dura-bar-wrap"><view class="dura-bar-fill" style="width: {{item.durability}}%; background: {{item.durability > 50 ? 'var(--success)' : item.durability > 20 ? 'var(--accent2)' : 'var(--danger)'}}"></view></view>
+            <text class="dura-text">{{item.durability}}%</text>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="empty-hint">暂无装备</view>
+    </view>
+
+    <!-- 背包 -->
+    <view class="section">
+      <view class="section-title">背包</view>
+      <view wx:if="{{inventory.length > 0}}" class="inventory-grid">
+        <view wx:for="{{inventory}}" wx:key="id" class="inv-item" bindtap="onUseItem" data-id="{{item.id}}">
+          <text class="inv-icon">{{item.icon}}</text><text class="inv-count">x{{item.count}}</text><text class="inv-name">{{item.name}}</text>
+        </view>
+      </view>
+      <view wx:else class="empty-hint">背包空空如也</view>
+    </view>
+
+    <!-- 明信片收集 -->
+    <view class="section">
+      <view class="section-title" bindtap="onTogglePostcards" style="display: flex; justify-content: space-between; align-items: center;">
+        <text>🖼 明信片 ({{postcardCollected}}/{{postcardTotal}})</text>
+        <text style="font-size: 22rpx; color: var(--text-muted);">{{showPostcards ? '收起 ▲' : '查看 ▼'}}</text>
+      </view>
+      <!-- 收集进度条 -->
+      <view class="postcard-progress-bar">
+        <view class="postcard-progress-fill" style="width: {{postcardPercent}}%; background: linear-gradient(90deg, var(--accent), #b794f4);"></view>
+      </view>
+      <view wx:if="{{showPostcards}}" class="postcard-gallery">
+        <view wx:for="{{postcards}}" wx:key="id" class="postcard-item {{item.collected ? 'collected' : 'locked'}}" style="{{item.collected ? 'border-color: ' + item.rarityColor : ''}}">
+          <view class="postcard-emoji-wrap">
+            <text class="postcard-emoji">{{item.collected ? item.emoji : '❓'}}</text>
+          </view>
+          <view class="postcard-info">
+            <view class="postcard-title">{{item.collected ? item.title : '???'}}</view>
+            <view class="postcard-station">{{item.stationName}}</view>
+            <view class="postcard-desc">{{item.desc}}</view>
+          </view>
+          <view class="postcard-rarity" style="color: {{item.collected ? item.rarityColor : 'var(--text-muted)'}};">
+            {{item.rarityLabel}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 成就（全部，含未解锁） -->
+    <view class="section">
+      <view class="section-title">成就 ({{unlockedCount}}/{{totalAchievements}})</view>
+      <view class="achievement-list">
+        <view wx:for="{{achievements}}" wx:key="id" class="achievement-item {{item.unlocked ? 'unlocked' : 'locked'}}">
+          <text class="ach-icon">{{item.unlocked ? item.icon : '🔒'}}</text>
+          <view class="ach-info">
+            <view class="ach-name">{{item.name}}</view>
+            <view class="ach-desc">{{item.unlocked ? item.desc : '???'}}</view>
+          </view>
+          <view class="ach-reward">
+            <text class="reward-text">{{item.rewardText}}</text>
+            <text wx:if="{{item.unlocked}}" class="unlocked-tag">已解锁</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 设置 -->
+    <view class="section">
+      <view class="section-title">设置</view>
+      <view class="setting-item card">
+        <view class="setting-left"><text class="setting-icon">👻</text><view class="setting-info"><view class="setting-name">隐身模式</view><view class="setting-desc">其他骑友将看不到你的位置</view></view></view>
+        <switch checked="{{stealth}}" bindchange="onStealthChange" color="var(--accent)" />
+      </view>
+    </view>
+    <view class="footer-space"></view>
+  </scroll-view>
+</view>

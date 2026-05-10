@@ -1,0 +1,359 @@
+.station-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 32rpx;
+  padding-top: 80rpx;
+}
+
+/* ========== 关闭按钮 ========== */
+.close-btn {
+  position: fixed;
+  top: 48rpx;
+  right: 32rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 32rpx;
+  z-index: 100;
+}
+
+.close-btn:active {
+  background: var(--bg-glass);
+}
+
+/* ========== 站点头部 ========== */
+.station-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32rpx;
+}
+
+.station-icon-wrap {
+  width: 160rpx;
+  height: 160rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: 20rpx;
+}
+
+.station-icon {
+  font-size: 80rpx;
+}
+
+.station-name {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16rpx;
+}
+
+.station-meta {
+  display: flex;
+  gap: 24rpx;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+.meta-icon {
+  font-size: 22rpx;
+}
+
+/* ========== 站点描述 ========== */
+.station-desc {
+  margin-bottom: 24rpx;
+}
+
+.desc-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12rpx;
+}
+
+.desc-text {
+  font-size: 26rpx;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 16rpx;
+}
+
+.desc-event {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  padding-top: 12rpx;
+  border-top: 1rpx solid var(--border);
+}
+
+.event-label {
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+/* ========== 骑友列表 ========== */
+.rider-section {
+  margin-bottom: 24rpx;
+}
+
+.section-header {
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rider-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.rider-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.rider-item:last-child {
+  border-bottom: none;
+}
+
+.rider-avatar-wrap {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: var(--bg-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rider-emoji {
+  font-size: 32rpx;
+}
+
+.rider-info {
+  flex: 1;
+}
+
+.rider-name {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.rider-title {
+  font-size: 20rpx;
+  color: var(--accent);
+  margin-top: 2rpx;
+}
+
+.rider-km {
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+.empty-hint {
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-muted);
+  padding: 32rpx 0;
+}
+
+/* ========== 商店入口 ========== */
+.shop-section {
+  margin-bottom: 24rpx;
+}
+
+.shop-section:active {
+  opacity: 0.85;
+}
+
+.shop-inner {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.shop-icon {
+  font-size: 48rpx;
+}
+
+.shop-info {
+  flex: 1;
+}
+
+.shop-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.shop-hint {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+}
+
+.shop-arrow {
+  font-size: 40rpx;
+  color: var(--text-muted);
+}
+
+/* ========== 特殊事件 ========== */
+.special-section {
+  margin-bottom: 24rpx;
+  border: 1rpx solid rgba(246, 173, 85, 0.2);
+}
+
+.special-section:active {
+  opacity: 0.85;
+}
+
+.special-inner {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.special-icon {
+  font-size: 48rpx;
+}
+
+.special-info {
+  flex: 1;
+}
+
+.special-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--accent2);
+}
+
+.special-hint {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+}
+
+.special-arrow {
+  font-size: 40rpx;
+  color: var(--text-muted);
+}
+
+/* ========== 商店内嵌列表 ========== */
+.shop-list {
+  margin-bottom: 24rpx;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.shop-list-title {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14rpx;
+  padding: 20rpx;
+}
+
+.shop-item-left {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.shop-item-icon {
+  font-size: 44rpx;
+  flex-shrink: 0;
+}
+
+.shop-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shop-item-name {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.shop-item-desc {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 2rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.buy-btn {
+  flex-shrink: 0;
+  height: 64rpx !important;
+  padding: 0 24rpx !important;
+  font-size: 24rpx !important;
+  min-width: 120rpx;
+}
+
+.owned-btn {
+  flex-shrink: 0;
+  height: 64rpx !important;
+  padding: 0 24rpx !important;
+  font-size: 24rpx !important;
+  min-width: 120rpx;
+  opacity: 0.5;
+}
+
+.disabled-btn {
+  flex-shrink: 0;
+  height: 64rpx !important;
+  padding: 0 24rpx !important;
+  font-size: 24rpx !important;
+  min-width: 120rpx;
+  opacity: 0.4;
+}
+
+.shop-arrow {
+  font-size: 40rpx;
+  color: var(--text-muted);
+  transition: transform 0.3s;
+}
+
+.shop-arrow.open {
+  transform: rotate(90deg);
+}

@@ -1,0 +1,94 @@
+/* components/ad-modal/index.wxss  广告复活弹窗 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.ad-card {
+  width: 580rpx;
+  background: linear-gradient(160deg, #1a1030, #12233d);
+  border: 1rpx solid rgba(252, 129, 129, 0.25);
+  border-radius: 28rpx;
+  padding: 56rpx 48rpx 44rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 16rpx 60rpx rgba(0, 0, 0, 0.5);
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.ad-enter {
+  animation: adPop 0.3s ease-out forwards;
+}
+
+@keyframes adPop {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ad-icon-wrap {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: rgba(252, 129, 129, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28rpx;
+}
+
+.ad-icon {
+  font-size: 64rpx;
+  line-height: 1;
+}
+
+.ad-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--danger);
+  margin-bottom: 16rpx;
+}
+
+.ad-penalty {
+  font-size: 26rpx;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+  padding: 0 8rpx;
+}
+
+.ad-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.ad-btn-icon {
+  font-size: 28rpx;
+}
+
+.ad-skip {
+  margin-top: 28rpx;
+  font-size: 24rpx;
+  color: var(--text-muted);
+  text-decoration: underline;
+  padding: 8rpx 16rpx;
+}
+
+.ad-skip:active {
+  opacity: 0.6;
+}

@@ -1,0 +1,43 @@
+<!--games/wind-balance/index.wxml  横风平衡关卡-->
+<view class="game-wrap">
+  <!-- HUD 顶栏 -->
+  <view class="game-hud">
+    <view class="hud-balance">
+      <text class="hud-balance-label">平衡</text>
+      <view class="hud-balance-bar">
+        <view class="hud-balance-fill" style="width:{{balancePct}}%;background:{{balanceColor}}"></view>
+      </view>
+    </view>
+    <view class="hud-timer">{{timerSec}}s</view>
+  </view>
+
+  <!-- 风向提示 -->
+  <view class="wind-indicator">
+    <text class="wind-text">{{windInfo}}</text>
+  </view>
+
+  <!-- 游戏画布 -->
+  <canvas
+    type="2d"
+    id="game-canvas"
+    class="game-canvas"
+    style="width:{{canvasW}}px;height:{{canvasH}}px"
+    bindtouchstart="onTouchStart"
+  ></canvas>
+
+  <!-- 结算 -->
+  <view class="game-result" wx:if="{{finished}}">
+    <view class="result-icon">{{won ? '🎉' : '💨'}}</view>
+    <view class="result-title">{{won ? '成功保持平衡！' : '被风吹倒了...'}}</view>
+    <button class="btn btn-primary result-btn" bindtap="onBack">返回</button>
+  </view>
+
+  <!-- 广告弹窗 -->
+  <ad-modal
+    show="{{showAd}}"
+    title="被强风吹倒"
+    penalty="体能 -10"
+    bind:ad="onAdRevive"
+    bind:skip="onAdSkip"
+  />
+</view>

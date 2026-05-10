@@ -1,0 +1,218 @@
+<view class="map-page">
+  <!-- 天气指示器 -->
+  <view class="weather-bar safe-top">
+    <view class="weather-info">
+      <text class="weather-icon">{{weatherIcon}}</text>
+      <text class="weather-name">{{weatherName}}</text>
+      <text class="weather-desc">{{weatherDesc}}</text>
+    </view>
+    <view class="weather-cost" wx:if="{{weatherCostMult > 1.0}}">
+      <text class="cost-badge">消耗 x{{weatherCostMult}}</text>
+    </view>
+  </view>
+
+  <!-- 顶部状态栏 -->
+  <view class="status-bar">
+    <view class="status-row">
+      <view class="status-item">
+        <text class="status-label">Day</text>
+        <text class="status-value">{{day}}</text>
+      </view>
+      <view class="status-item location">
+        <text class="status-label">📍</text>
+        <text class="status-value">{{currentStationName}}</text>
+      </view>
+      <view class="status-item">
+        <text class="status-label">海拔</text>
+        <text class="status-value">{{elevation}}m</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据栏：体能/已骑行/心情/耐久/金币/适应度 -->
+  <view class="stats-bar">
+    <view class="stat-card">
+      <view class="stat-icon">⚡</view>
+      <view class="stat-info">
+        <view class="stat-label">体能</view>
+        <view class="stat-bar-wrap">
+          <view class="stat-bar-fill energy" style="width: {{energyPct}}%"></view>
+        </view>
+        <view class="stat-num">{{energy}}/200</view>
+      </view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-icon">🛤️</view>
+      <view class="stat-info">
+        <view class="stat-label">已骑行</view>
+        <view class="stat-num highlight">{{km}} km</view>
+      </view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-icon">😊</view>
+      <view class="stat-info">
+        <view class="stat-label">心情</view>
+        <view class="stat-bar-wrap">
+          <view class="stat-bar-fill mood" style="width: {{moodPct}}%"></view>
+        </view>
+        <view class="stat-num">{{mood}}</view>
+      </view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-icon">🔧</view>
+      <view class="stat-info">
+        <view class="stat-label">耐久</view>
+        <view class="stat-bar-wrap">
+          <view class="stat-bar-fill durability" style="width: {{durabilityPct}}%"></view>
+        </view>
+        <view class="stat-num">{{durability}}%</view>
+      </view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-icon">🪙</view>
+      <view class="stat-info">
+        <view class="stat-label">金币</view>
+        <view class="stat-num coin-text">{{coins}}</view>
+      </view>
+    </view>
+    <view class="stat-card" wx:if="{{altitudeAdapt > 0}}">
+      <view class="stat-icon">🫁</view>
+      <view class="stat-info">
+        <view class="stat-label">高反适应</view>
+        <view class="stat-bar-wrap">
+          <view class="stat-bar-fill adapt" style="width: {{adaptPct}}%"></view>
+        </view>
+        <view class="stat-num">{{altitudeAdapt}}%</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 中间路线滚动区 -->
+  <scroll-view scroll-y class="route-scroll" scroll-into-view="station-{{currentStation}}" scroll-with-animation>
+    <view class="route-line">
+      <view wx:for="{{stations}}" wx:key="id"
+        id="station-{{item.id}}"
+        class="station-node {{item.id === currentStation ? 'current' : ''}} {{item.id < currentStation ? 'passed' : ''}} {{item.id > currentStation ? 'future' : ''}}"
+        bindtap="onStationTap" data-id="{{item.id}}">
+        <view wx:if="{{item.id > 0}}" class="connector {{item.id <= currentStation ? 'active' : ''}}">
+          <view class="connector-fill" style="{{item.id <= currentStation ? 'height:100%' : item.id === currentStation + 1 ? 'height:' + progressToNext + '%' : 'height:0%'}}"></view>
+        </view>
+        <view class="node-dot {{item.id <= currentStation ? 'dot-active' : ''}}">
+          <text class="node-icon">{{item.icon}}</text>
+          <view class="rider-pulse" wx:if="{{item.riderCount > 0}}"></view>
+        </view>
+        <view class="node-info">
+          <view class="node-name">{{item.name}}</view>
+          <view class="node-meta">
+            <text class="node-km">{{item.km}} km</text>
+            <text class="node-elev">↑{{item.elev}}m</text>
+          </view>
+          <view wx:if="{{item.riderCount > 0}}" class="rider-bubbles">
+            <view class="bubble-avatars">
+              <text wx:for="{{item.riderAvatars}}" wx:for-item="avatar" wx:key="*this" class="bubble-emoji">🚴</text>
+            </view>
+            <text class="bubble-count">{{item.riderCount}}人在此</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-actions safe-bottom">
+    <button class="btn btn-primary ride-btn" bindtap="onRideTap">🚴 骑行出发</button>
+    <button class="btn btn-ghost quest-btn" bindtap="onToggleQuests">📋 任务 {{showQuests ? '▲' : '▼'}}</button>
+    <button class="btn btn-ghost profile-btn" bindtap="onProfileTap">👤</button>
+  </view>
+
+  <!-- 每日任务面板 -->
+  <view class="quest-panel" wx:if="{{showQuests}}">
+    <view class="quest-overlay" bindtap="onToggleQuests"></view>
+    <view class="quest-sheet">
+      <view class="quest-header">
+        <text class="quest-title">📋 每日任务</text>
+        <view class="quest-streak {{loginStreak >= 3 ? 'streak-hot' : ''}}" wx:if="{{loginStreak > 0}}">
+          <view class="streak-fire-wrap">
+            <text class="streak-fire">🔥</text>
+            <view class="streak-fire-aura" wx:if="{{loginStreak >= 3}}"></view>
+          </view>
+          <text class="streak-num">连续{{loginStreak}}天</text>
+        </view>
+      </view>
+      <scroll-view scroll-y class="quest-list">
+        <view wx:for="{{quests}}" wx:key="id" class="quest-item {{item.completed ? 'completed' : ''}}">
+          <view class="quest-left">
+            <view class="quest-diff-tag diff-{{item.difficulty}}">
+              {{item.difficulty === 1 ? '简单' : item.difficulty === 2 ? '普通' : '挑战'}}
+            </view>
+            <view class="quest-info">
+              <view class="quest-name">{{item.name}}</view>
+              <view class="quest-desc">{{item.desc}}</view>
+              <view class="quest-progress-bar">
+                <view class="quest-progress-fill" style="width: {{item.completed ? 100 : (item.progress / item.target * 100)}}%"></view>
+              </view>
+              <view class="quest-progress-text">{{item.progress}}/{{item.target}}</view>
+            </view>
+          </view>
+          <view class="quest-right">
+            <view class="quest-reward">+{{item.reward}}🪙</view>
+            <button wx:if="{{item.completed && !item.claimed}}" class="btn btn-primary quest-claim-btn" bindtap="onClaimQuest" data-id="{{item.id}}">领取</button>
+            <view wx:elif="{{item.claimed}}" class="quest-claimed">已领</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 登录奖励弹窗 -->
+  <view class="reward-modal" wx:if="{{showLoginReward}}">
+    <view class="reward-overlay" bindtap="onCloseLoginReward"></view>
+    <view class="reward-card">
+      <view class="reward-header {{loginStreak >= 3 ? 'streak-hot' : ''}}">
+        <view class="reward-fire-wrap">
+          <text class="reward-fire">🔥</text>
+          <view class="reward-fire-aura" wx:if="{{loginStreak >= 3}}"></view>
+        </view>
+        <text class="reward-title">每日签到</text>
+        <text class="reward-streak">连续 {{loginStreak}} 天</text>
+      </view>
+      <view wx:if="{{loginIsReset}}" class="reward-reset-hint">上次登录超过36小时，连续天数已重置</view>
+      <!-- 7天奖励预览 -->
+      <view class="reward-cycle">
+        <view wx:for="{{rewardCycle}}" wx:key="day" class="reward-day {{loginStreak % 7 === item.day ? 'today' : loginStreak % 7 > item.day ? 'claimed' : ''}}">
+          <text class="reward-day-num">Day{{item.day}}</text>
+          <text class="reward-day-icon">{{item.item ? '🎁' : '🪙'}}</text>
+          <text class="reward-day-amount">{{item.coins}}</text>
+        </view>
+      </view>
+      <!-- 今日奖励详情 -->
+      <view class="reward-today" wx:if="{{loginReward}}">
+        <text class="reward-today-label">今日奖励</text>
+        <view class="reward-today-content">
+          <text class="reward-coins">+{{loginReward.coins}} 金币</text>
+          <text wx:if="{{loginReward.item}}" class="reward-item-text">+{{loginReward.itemName}}</text>
+        </view>
+      </view>
+      <button class="btn btn-primary reward-claim-btn" bindtap="onClaimLoginReward">领取奖励</button>
+    </view>
+  </view>
+
+  <!-- 成就解锁弹窗 -->
+  <view class="ach-modal" wx:if="{{showAchievement}}">
+    <view class="ach-overlay" bindtap="onAchievementDismiss"></view>
+    <view class="ach-card">
+      <view class="ach-glow"></view>
+      <view class="ach-stars">
+        <view class="ach-star s1">⭐</view>
+        <view class="ach-star s2">✦</view>
+        <view class="ach-star s3">⭐</view>
+        <view class="ach-star s4">✦</view>
+      </view>
+      <view class="ach-sparkle">✨</view>
+      <text class="ach-big-icon">{{achievementIcon}}</text>
+      <view class="ach-label">成就解锁</view>
+      <view class="ach-name">{{achievementName}}</view>
+      <button class="btn btn-primary ach-dismiss" bindtap="onAchievementDismiss">太棒了！</button>
+    </view>
+  </view>
+</view>

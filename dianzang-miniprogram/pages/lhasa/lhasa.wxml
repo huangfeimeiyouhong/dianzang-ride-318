@@ -1,0 +1,12 @@
+<!-- pages/DIR/DIR.wxml -->
+<view class="page-container">
+  <view class="header">
+    <text class="page-title">PAGE_TITLE</text>
+  </view>
+  <scroll-view class="content" scroll-y="true">
+    <view class="section">
+      <text class="section-title">功能区域</text>
+      <!-- 内容区域 -->
+    </view>
+  </scroll-view>
+</view>

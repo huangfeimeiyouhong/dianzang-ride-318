@@ -1,0 +1,35 @@
+<!--games/tire-fix/index.wxml  爆胎修补关卡-->
+<view class="game-wrap">
+  <!-- HUD -->
+  <view class="game-hud">
+    <view class="hud-patches">
+      <text class="hud-patches-label">已修补</text>
+      <text class="hud-patches-val text-accent">{{fixed}} / {{total}}</text>
+    </view>
+    <view class="hud-timer {{remainSec <= 3 ? 'hud-timer--urgent' : ''}}">{{remainSec}}s</view>
+  </view>
+
+  <!-- 游戏画布 -->
+  <canvas
+    type="2d"
+    id="game-canvas"
+    class="game-canvas"
+    style="width:{{canvasW}}px;height:{{canvasH}}px"
+    bindtouchstart="onTouch"
+  ></canvas>
+
+  <!-- 结算 -->
+  <view class="game-result" wx:if="{{finished}}">
+    <view class="result-icon">{{won ? '🔧' : '💨'}}</view>
+    <view class="result-title">{{won ? '轮胎修好了！' : '没修完，继续漏气...'}}</view>
+    <button class="btn btn-primary result-btn" bindtap="onBack">返回</button>
+  </view>
+
+  <ad-modal
+    show="{{showAd}}"
+    title="修补失败"
+    penalty="体能 -20"
+    bind:ad="onAdRevive"
+    bind:skip="onAdSkip"
+  />
+</view>

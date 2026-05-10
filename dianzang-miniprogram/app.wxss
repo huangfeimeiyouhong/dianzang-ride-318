@@ -1,0 +1,386 @@
+/* app.wxss - 全局样式 */
+
+/* CSS变量定义 */
+page {
+  --primary-color: #667eea;
+  --primary-dark: #764ba2;
+  --secondary-color: #f093fb;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #f44336;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-hint: #999999;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f6f6f6;
+  --bg-dark: #1a1a2e;
+  --border-color: #e0e0e0;
+  --shadow-light: 0 2rpx 12rpx rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4rpx 20rpx rgba(0, 0, 0, 0.15);
+  --shadow-heavy: 0 8rpx 30rpx rgba(0, 0, 0, 0.2);
+  
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  box-sizing: border-box;
+}
+
+/* 通用工具类 */
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* 文本工具类 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-hint {
+  color: var(--text-hint);
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+.font-small {
+  font-size: 24rpx;
+}
+
+.font-medium {
+  font-size: 28rpx;
+}
+
+.font-large {
+  font-size: 32rpx;
+}
+
+.font-xlarge {
+  font-size: 36rpx;
+}
+
+/* 间距工具类 */
+.margin-small {
+  margin: 10rpx;
+}
+
+.margin-medium {
+  margin: 20rpx;
+}
+
+.margin-large {
+  margin: 30rpx;
+}
+
+.padding-small {
+  padding: 10rpx;
+}
+
+.padding-medium {
+  padding: 20rpx;
+}
+
+.padding-large {
+  padding: 30rpx;
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: #ffffff;
+  border: none;
+  border-radius: 50rpx;
+  padding: 20rpx 60rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2rpx solid var(--primary-color);
+  border-radius: 50rpx;
+  padding: 18rpx 58rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.btn-small {
+  padding: 10rpx 30rpx;
+  font-size: 24rpx;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* 卡片样式 */
+.card {
+  background: var(--bg-primary);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin: 20rpx;
+  box-shadow: var(--shadow-light);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+}
+
+.card-content {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 徽章样式 */
+.badge {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+}
+
+.badge-primary {
+  background: var(--primary-color);
+  color: #ffffff;
+}
+
+.badge-success {
+  background: var(--success-color);
+  color: #ffffff;
+}
+
+.badge-warning {
+  background: var(--warning-color);
+  color: #ffffff;
+}
+
+/* 动画类 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
+}
+
+/* 安全区域适配 */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-top {
+  padding-top: constant(safe-area-inset-top);
+  padding-top: env(safe-area-inset-top);
+}
+
+/* 加载中样式 */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid var(--border-color);
+  border-top: 4rpx solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* 空状态样式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 100rpx 60rpx;
+}
+
+.empty-state image {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 40rpx;
+  opacity: 0.5;
+}
+
+.empty-state text {
+  font-size: 28rpx;
+  color: var(--text-hint);
+}
+
+/* 分割线 */
+.divider {
+  height: 1rpx;
+  background: var(--border-color);
+  margin: 20rpx 0;
+}
+
+.divider-vertical {
+  width: 1rpx;
+  height: 100%;
+  background: var(--border-color);
+  margin: 0 20rpx;
+}
+
+/* 遮罩层 */
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* 弹出层 */
+.popup {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  border-radius: 30rpx 30rpx 0 0;
+  padding: 40rpx;
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.popup-title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.popup-close {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40rpx;
+  color: var(--text-hint);
+}

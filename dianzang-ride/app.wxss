@@ -1,0 +1,150 @@
+/* ========== 全局 CSS 变量 ========== */
+page {
+  --bg: #0a1628;
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-glass: rgba(255, 255, 255, 0.08);
+  --accent: #4fd1c5;
+  --accent2: #f6ad55;
+  --danger: #fc8181;
+  --success: #68d391;
+  --text: #e2e8f0;
+  --text-muted: #718096;
+  --border: rgba(255, 255, 255, 0.08);
+
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+  overflow: hidden;
+}
+
+/* ========== 通用工具类 ========== */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-1 { flex: 1; }
+
+.text-accent { color: var(--accent); }
+.text-accent2 { color: var(--accent2); }
+.text-danger { color: var(--danger); }
+.text-muted { color: var(--text-muted); }
+.text-center { text-align: center; }
+.text-bold { font-weight: 700; }
+
+/* ========== 通用按钮 ========== */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx 48rpx;
+  border-radius: 50rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: none;
+  line-height: 1;
+}
+
+.btn::after { border: none; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #38b2ac);
+  color: #0a1628;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--accent2), #ed8936);
+  color: #0a1628;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger), #e53e3e);
+  color: #fff;
+}
+
+.btn-ghost {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1rpx solid var(--border);
+}
+
+.btn:active { opacity: 0.85; transform: scale(0.97); }
+
+/* ========== 卡片 ========== */
+.card {
+  background: var(--bg-card);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  backdrop-filter: blur(10px);
+}
+
+/* ========== 安全区域 ========== */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-top { padding-top: env(safe-area-inset-top); }
+
+/* ========== Phase 6: 社交强化动画 ========== */
+
+/* 连续火焰跳动 */
+@keyframes fireGlow {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  25% { transform: scale(1.15) translateY(-4rpx); filter: brightness(1.3); }
+  50% { transform: scale(1.05) translateY(-2rpx); filter: brightness(1.1); }
+  75% { transform: scale(1.2) translateY(-6rpx); filter: brightness(1.4); }
+}
+
+/* 火焰光晕 */
+@keyframes fireAura {
+  0%, 100% { box-shadow: 0 0 8rpx rgba(246, 173, 85, 0.3); }
+  50% { box-shadow: 0 0 20rpx rgba(246, 173, 85, 0.6), 0 0 40rpx rgba(246, 173, 85, 0.2); }
+}
+
+/* 脉冲呼吸灯 */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.8); opacity: 0; }
+}
+
+/* 五彩纸屑掉落 */
+@keyframes confettiFall {
+  0% { transform: translateY(-40rpx) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(300rpx) rotate(720deg); opacity: 0; }
+}
+
+@keyframes confettiFallLeft {
+  0% { transform: translateY(-40rpx) translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(300rpx) translateX(-80rpx) rotate(540deg); opacity: 0; }
+}
+
+@keyframes confettiFallRight {
+  0% { transform: translateY(-40rpx) translateX(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(300rpx) translateX(80rpx) rotate(900deg); opacity: 0; }
+}
+
+/* 金色光晕扩散 */
+@keyframes goldenGlow {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* 星光闪烁 */
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* 庆祝弹跳 */
+@keyframes celebrateBounce {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 进站闪光 */
+@keyframes stationArrive {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

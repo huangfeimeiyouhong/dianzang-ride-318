@@ -1,0 +1,63 @@
+/* components/event-toast/index.wxss  事件触发弹窗 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.toast-card {
+  width: 580rpx;
+  background: linear-gradient(160deg, #12233d, #0d1a2e);
+  border: 1rpx solid rgba(79, 209, 197, 0.2);
+  border-radius: 28rpx;
+  padding: 60rpx 48rpx 48rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 16rpx 60rpx rgba(0, 0, 0, 0.4);
+  transform: translateY(40rpx);
+  opacity: 0;
+}
+
+.toast-enter {
+  animation: toastSlideUp 0.35s ease-out forwards;
+}
+
+@keyframes toastSlideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.toast-icon {
+  font-size: 96rpx;
+  line-height: 1;
+  margin-bottom: 24rpx;
+}
+
+.toast-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 16rpx;
+}
+
+.toast-desc {
+  font-size: 26rpx;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+}
+
+.toast-btn {
+  width: 100%;
+}

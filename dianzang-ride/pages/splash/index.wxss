@@ -1,0 +1,149 @@
+.splash {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180deg, #0a1628 0%, #0f2440 40%, #1a365d 70%, #0a1628 100%);
+  overflow: hidden;
+}
+
+/* ========== 雪山剪影 ========== */
+.mountain-silhouette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50vh;
+  pointer-events: none;
+}
+
+.mountain {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.mountain-1 {
+  left: -10%;
+  border-width: 0 50vw 40vh 50vw;
+  border-color: transparent transparent rgba(255, 255, 255, 0.03) transparent;
+}
+
+.mountain-2 {
+  left: 20%;
+  border-width: 0 40vw 50vh 40vw;
+  border-color: transparent transparent rgba(255, 255, 255, 0.05) transparent;
+}
+
+.mountain-3 {
+  right: -10%;
+  border-width: 0 45vw 35vh 45vw;
+  border-color: transparent transparent rgba(255, 255, 255, 0.04) transparent;
+}
+
+/* 雪花粒子 */
+.snow-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.particle {
+  position: absolute;
+  width: 6rpx;
+  height: 6rpx;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: snowfall 6s linear infinite;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 5s; }
+.particle:nth-child(2) { left: 25%; animation-delay: 1s; animation-duration: 7s; }
+.particle:nth-child(3) { left: 40%; animation-delay: 2s; animation-duration: 6s; }
+.particle:nth-child(4) { left: 55%; animation-delay: 0.5s; animation-duration: 8s; }
+.particle:nth-child(5) { left: 70%; animation-delay: 1.5s; animation-duration: 5.5s; }
+.particle:nth-child(6) { left: 85%; animation-delay: 3s; animation-duration: 6.5s; }
+.particle:nth-child(7) { left: 15%; animation-delay: 2.5s; animation-duration: 7.5s; }
+.particle:nth-child(8) { left: 60%; animation-delay: 4s; animation-duration: 5s; }
+
+@keyframes snowfall {
+  0% { transform: translateY(-20vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(50vh); opacity: 0; }
+}
+
+/* ========== Logo 标题区 ========== */
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  animation: fadeInUp 1s ease-out;
+}
+
+.logo-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+}
+
+.title {
+  font-size: 80rpx;
+  font-weight: 800;
+  letter-spacing: 12rpx;
+  background: linear-gradient(135deg, var(--accent), #63b3ed, var(--accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 16rpx;
+}
+
+.subtitle {
+  font-size: 36rpx;
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 8rpx;
+  margin-bottom: 12rpx;
+}
+
+.tagline {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  letter-spacing: 4rpx;
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(40rpx); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== 底部按钮区 ========== */
+.bottom-area {
+  position: absolute;
+  bottom: 120rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  animation: fadeInUp 1.2s ease-out;
+}
+
+.start-btn {
+  width: 400rpx;
+  height: 96rpx;
+  font-size: 34rpx;
+  letter-spacing: 6rpx;
+}
+
+.version {
+  margin-top: 24rpx;
+  font-size: 20rpx;
+  color: var(--text-muted);
+}

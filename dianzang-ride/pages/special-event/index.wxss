@@ -1,0 +1,217 @@
+.spe-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 0 32rpx;
+}
+
+.spe-close {
+  position: fixed;
+  top: 48rpx;
+  right: 32rpx;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 32rpx;
+  z-index: 100;
+}
+
+/* ========== 头部 ========== */
+.spe-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.spe-big-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.spe-type-tag {
+  font-size: 22rpx;
+  font-weight: 600;
+  padding: 6rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.type-story { background: rgba(99, 179, 237, 0.15); color: #63b3ed; }
+.type-challenge { background: rgba(252, 129, 129, 0.15); color: #fc8181; }
+.type-celebration { background: rgba(246, 173, 85, 0.15); color: #f6ad55; }
+
+.spe-name {
+  text-align: center;
+  font-size: 42rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 32rpx;
+}
+
+/* ========== 故事文本 ========== */
+.spe-story {
+  margin-bottom: 32rpx;
+}
+
+.spe-story-text {
+  font-size: 28rpx;
+  color: var(--text);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* ========== 选择项 ========== */
+.spe-choices {
+  margin-bottom: 28rpx;
+}
+
+.spe-choices-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 16rpx;
+}
+
+.spe-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  padding: 20rpx;
+  background: var(--bg-card);
+  border-radius: 16rpx;
+  margin-bottom: 14rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.spe-choice.selected {
+  border-color: var(--accent);
+  background: rgba(79, 209, 197, 0.08);
+}
+
+.spe-choice:active {
+  opacity: 0.85;
+}
+
+.choice-radio {
+  padding-top: 6rpx;
+  flex-shrink: 0;
+}
+
+.choice-radio-inner {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  border: 3rpx solid var(--text-muted);
+  transition: all 0.2s;
+}
+
+.choice-radio-inner.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 0 4rpx rgba(79, 209, 197, 0.2);
+}
+
+.choice-info {
+  flex: 1;
+}
+
+.choice-text {
+  font-size: 28rpx;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.choice-desc {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+}
+
+.choice-penalty {
+  font-size: 20rpx;
+  color: var(--danger);
+  margin-top: 6rpx;
+}
+
+/* ========== 奖励预览 ========== */
+.spe-reward-preview {
+  margin-bottom: 32rpx;
+}
+
+.reward-preview-title {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  margin-bottom: 8rpx;
+}
+
+.reward-preview-items {
+  font-size: 24rpx;
+  color: var(--accent2);
+  line-height: 1.8;
+}
+
+/* ========== 确认按钮 ========== */
+.spe-confirm {
+  width: 100%;
+  height: 96rpx;
+  font-size: 34rpx;
+}
+
+/* ========== 结果页 ========== */
+.spe-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 160rpx;
+}
+
+.result-icon-wrap {
+  position: relative;
+  margin-bottom: 28rpx;
+}
+
+.result-sparkle {
+  position: absolute;
+  top: -20rpx;
+  right: -30rpx;
+  font-size: 48rpx;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(1.2) rotate(15deg); }
+}
+
+.result-icon {
+  font-size: 140rpx;
+}
+
+.result-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 32rpx;
+}
+
+.result-message {
+  width: 100%;
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--accent2);
+  line-height: 1.8;
+  margin-bottom: 40rpx;
+  padding: 32rpx;
+}
+
+.result-btn {
+  width: 100%;
+  height: 96rpx;
+  font-size: 34rpx;
+}

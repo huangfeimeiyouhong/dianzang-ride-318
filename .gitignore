@@ -1,0 +1,16 @@
+node_modules/
+**/node_modules/
+
+.workbuddy/
+
+nul
+
+**/project.private.config.json
+
+dist/
+build/
+coverage/
+
+.env
+.env.*
+*.log

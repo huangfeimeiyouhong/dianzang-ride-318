@@ -1,0 +1,161 @@
+<!-- pages/character/character.wxml - 角色定制页面 -->
+<view class="page-container">
+  <!-- Top Bar -->
+  <view class="top-bar">
+    <view class="back-btn" bindtap="goBack">←</view>
+    <text class="page-title">角色定制</text>
+    <view class="save-btn" bindtap="saveCustomization">保存</view>
+  </view>
+
+  <!-- Character Preview -->
+  <view class="character-preview">
+    <view class="character-svg">
+      <!-- Bike -->
+      <view class="bike">
+        <view class="wheel back-wheel"></view>
+        <view class="wheel front-wheel"></view>
+        <view class="bike-frame-line"></view>
+        <view class="bike-frame-triangle" style="background: {{bikeColor}};"></view>
+      </view>
+      
+      <!-- Rider -->
+      <view class="rider">
+        <view class="rider-head"></view>
+        <view class="helmet" style="background: {{helmetColor}};"></view>
+        <view class="rider-body" style="background: {{jerseyColor}};"></view>
+        <view class="rider-arm-left" style="background: {{jerseyColor}};"></view>
+        <view class="rider-arm-right" style="background: {{jerseyColor}};"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Customization Options -->
+  <scroll-view class="customization-section" scroll-y="true">
+    <text class="section-title">🪖 头盔颜色</text>
+    <view class="option-grid">
+      <view class="option-item {{helmetColor === '#C62828' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="helmet" 
+            data-color="#C62828">
+        <view class="color-preview" style="background: #C62828;"></view>
+        <text class="option-label">红色</text>
+      </view>
+      
+      <view class="option-item {{helmetColor === '#1976D2' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="helmet" 
+            data-color="#1976D2">
+        <view class="color-preview" style="background: #1976D2;"></view>
+        <text class="option-label">蓝色</text>
+      </view>
+      
+      <view class="option-item {{helmetColor === '#333333' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="helmet" 
+            data-color="#333333">
+        <view class="color-preview" style="background: #333333;"></view>
+        <text class="option-label">黑色</text>
+      </view>
+      
+      <view class="option-item {{helmetColor === '#EEEEEE' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="helmet" 
+            data-color="#EEEEEE">
+        <view class="color-preview" style="background: #EEEEEE;"></view>
+        <text class="option-label">白色</text>
+      </view>
+    </view>
+
+    <text class="section-title">👕 骑行服颜色</text>
+    <view class="option-grid">
+      <view class="option-item {{jerseyColor === '#1976D2' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="jersey" 
+            data-color="#1976D2">
+        <view class="color-preview" style="background: #1976D2;"></view>
+        <text class="option-label">蓝色</text>
+      </view>
+      
+      <view class="option-item {{jerseyColor === '#C62828' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="jersey" 
+            data-color="#C62828">
+        <view class="color-preview" style="background: #C62828;"></view>
+        <text class="option-label">红色</text>
+      </view>
+      
+      <view class="option-item {{jerseyColor === '#4CAF50' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="jersey" 
+            data-color="#4CAF50">
+        <view class="color-preview" style="background: #4CAF50;"></view>
+        <text class="option-label">绿色</text>
+      </view>
+      
+      <view class="option-item {{jerseyColor === '#FF6B35' ? 'selected' : ''}}" 
+            bindtap="selectOption" 
+            data-type="jersey" 
+            data-color="#FF6B35">
+        <view class="color-preview" style="background: #FF6B35;"></view>
+        <text class="option-label">橙色</text>
+      </view>
+    </view>
+
+    <text class="section-title">🚲 自行车颜色</text>
+    <view class="color-picker">
+      <view class="color-option {{bikeColor === '#333333' ? 'selected' : ''}}" 
+            style="background: #333333;"
+            bindtap="selectBikeColor" 
+            data-color="#333333"></view>
+      
+      <view class="color-option {{bikeColor === '#FF6B35' ? 'selected' : ''}}" 
+            style="background: #FF6B35;"
+            bindtap="selectBikeColor" 
+            data-color="#FF6B35"></view>
+      
+      <view class="color-option {{bikeColor === '#1976D2' ? 'selected' : ''}}" 
+            style="background: #1976D2;"
+            bindtap="selectBikeColor" 
+            data-color="#1976D2"></view>
+      
+      <view class="color-option {{bikeColor === '#4CAF50' ? 'selected' : ''}}" 
+            style="background: #4CAF50;"
+            bindtap="selectBikeColor" 
+            data-color="#4CAF50"></view>
+      
+      <view class="color-option {{bikeColor === '#FFD700' ? 'selected' : ''}}" 
+            style="background: #FFD700;"
+            bindtap="selectBikeColor" 
+            data-color="#FFD700"></view>
+    </view>
+
+    <!-- Stats Preview -->
+    <view class="stats-preview">
+      <text class="stats-title">📊 装备属性预览</text>
+      <view class="stat-row">
+        <text class="stat-label">速度</text>
+        <text class="stat-value {{statUpdating ? 'updating' : ''}}">+{{speedStat}}</text>
+      </view>
+      <view class="stat-row">
+        <text class="stat-label">防御</text>
+        <text class="stat-value {{statUpdating ? 'updating' : ''}}">+{{defenseStat}}</text>
+      </view>
+      <view class="stat-row">
+        <text class="stat-label">魅力</text>
+        <text class="stat-value {{statUpdating ? 'updating' : ''}}">+{{charmStat}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- Save Confirmation Modal -->
+  <view class="overlay {{showConfirmation ? 'show' : ''}}" bindtap="closeConfirmation"></view>
+  <view class="save-confirmation {{showConfirmation ? 'show' : ''}}">
+    <view class="confirmation-icon">✅</view>
+    <text class="confirmation-text">保存成功！</text>
+  </view>
+</view>
+
+<!-- Toast Notification -->
+<view class="toast {{showToast ? 'show' : ''}}" wx:if="{{showToast}}">
+  <text>{{toastMessage}}</text>
+</view>

@@ -1,0 +1,50 @@
+{
+  "pages": [
+    "pages/splash/index",
+    "pages/customize/index",
+    "pages/map/index",
+    "pages/riding/index",
+    "pages/station/index",
+    "pages/special-event/index",
+    "pages/profile/index"
+  ],
+  "subpackages": [
+    {
+      "root": "games",
+      "name": "mini-games",
+      "pages": [
+        "rock-dodge/index",
+        "dog-chase/index",
+        "avalanche/index",
+        "tire-fix/index",
+        "wind-balance/index",
+        "rhythm-tap/index",
+        "energy-sprint/index",
+        "river-cross/index",
+        "climb-charge/index",
+        "photo-checkin/index"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/map/index": {
+      "network": "all",
+      "packages": ["mini-games"]
+    }
+  },
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColor": "#0a1628",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0a1628",
+    "navigationBarTitleText": "滇藏骑行",
+    "navigationBarTextStyle": "white"
+  },
+  "sitemapLocation": "sitemap.json",
+  "requiredPrivateInfos": ["getLocation"],
+  "permission": {
+    "scope.werun": {
+      "desc": "需要获取你的微信运动步数来转化为骑行体能"
+    }
+  }
+}

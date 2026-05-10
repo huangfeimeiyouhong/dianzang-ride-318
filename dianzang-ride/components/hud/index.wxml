@@ -1,0 +1,38 @@
+<!--components/hud/index.wxml  顶部状态栏-->
+<view class="hud safe-top">
+  <!-- 体能 -->
+  <view class="hud-cell">
+    <view class="hud-value text-accent">{{energy}}</view>
+    <view class="hud-label">体能</view>
+    <view class="hud-bar">
+      <view class="hud-bar-fill hud-bar--energy" style="width:{{energyPct}}%"></view>
+    </view>
+  </view>
+
+  <!-- 已骑行 -->
+  <view class="hud-cell">
+    <view class="hud-value text-accent2">{{km}}<text class="hud-unit">km</text></view>
+    <view class="hud-label">已骑行</view>
+    <view class="hud-bar">
+      <view class="hud-bar-fill hud-bar--km" style="width:{{kmPct}}%"></view>
+    </view>
+  </view>
+
+  <!-- 心情 -->
+  <view class="hud-cell">
+    <view class="hud-value" style="color:{{moodColor}}">{{mood}}</view>
+    <view class="hud-label">心情</view>
+    <view class="hud-bar">
+      <view class="hud-bar-fill hud-bar--mood" style="width:{{mood}}%"></view>
+    </view>
+  </view>
+
+  <!-- 耐久 -->
+  <view class="hud-cell">
+    <view class="hud-value" style="color:{{durabilityColor}}">{{durability}}</view>
+    <view class="hud-label">耐久</view>
+    <view class="hud-bar">
+      <view class="hud-bar-fill hud-bar--durability" style="width:{{durability}}%"></view>
+    </view>
+  </view>
+</view>

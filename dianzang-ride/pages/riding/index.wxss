@@ -1,0 +1,675 @@
+.riding-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+}
+
+/* ========== 场景动画区 ========== */
+.scene-area {
+  position: relative;
+  width: 100%;
+  height: 40vh;
+  background: linear-gradient(180deg, #1a365d 0%, #2d3748 60%, #4a5568 100%);
+  overflow: hidden;
+}
+
+.sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+}
+
+.cloud {
+  position: absolute;
+  font-size: 60rpx;
+  opacity: 0.4;
+}
+
+.cloud-1 {
+  top: 20%;
+  left: 80%;
+  animation: cloudMove 12s linear infinite;
+}
+
+.cloud-2 {
+  top: 35%;
+  left: 60%;
+  animation: cloudMove 18s linear infinite;
+  animation-delay: -6s;
+  font-size: 48rpx;
+}
+
+@keyframes cloudMove {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-120vw); }
+}
+
+.terrain-desc {
+  position: absolute;
+  top: 24rpx;
+  left: 32rpx;
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.5);
+  z-index: 5;
+}
+
+.road-area {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: #2d3748;
+}
+
+/* 路面线条 */
+.road-lines {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  display: flex;
+  gap: 40rpx;
+  transform: translateY(-50%);
+}
+
+.road-lines.animating {
+  animation: roadScroll 1s linear infinite;
+}
+
+.road-line {
+  width: 80rpx;
+  height: 6rpx;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3rpx;
+  flex-shrink: 0;
+}
+
+@keyframes roadScroll {
+  0% { transform: translateX(0) translateY(-50%); }
+  100% { transform: translateX(-120rpx) translateY(-50%); }
+}
+
+/* 骑手 */
+.rider-sprite {
+  position: absolute;
+  bottom: 40%;
+  left: 30%;
+  z-index: 10;
+}
+
+.rider-sprite.riding {
+  animation: riderBounce 0.4s ease-in-out infinite;
+}
+
+.rider-emoji {
+  font-size: 80rpx;
+}
+
+@keyframes riderBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12rpx); }
+}
+
+/* ========== 公里数显示 ========== */
+.km-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  padding: 40rpx 0 16rpx;
+}
+
+.km-number {
+  font-size: 96rpx;
+  font-weight: 800;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2rpx;
+}
+
+.km-unit {
+  font-size: 36rpx;
+  color: var(--text-muted);
+  margin-left: 8rpx;
+}
+
+/* ========== 进度条 ========== */
+.progress-area {
+  padding: 0 48rpx;
+  margin-bottom: 32rpx;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-bottom: 12rpx;
+}
+
+.progress-bar-wrap {
+  width: 100%;
+  height: 16rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 8rpx;
+  transition: width 0.3s ease;
+}
+
+.progress-km {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-top: 8rpx;
+}
+
+/* ========== 骑行信息 ========== */
+.ride-info {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 32rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.info-icon {
+  font-size: 36rpx;
+}
+
+.info-label {
+  font-size: 20rpx;
+  color: var(--text-muted);
+}
+
+.info-value {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ========== 结算卡 ========== */
+.settle-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto 32rpx;
+  padding: 48rpx 32rpx;
+  background: var(--bg-card);
+  border-radius: 28rpx;
+  backdrop-filter: blur(10px);
+}
+
+.settle-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.settle-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.settle-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.new-station-name {
+  font-size: 36rpx;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 24rpx;
+}
+
+.settle-stats {
+  width: 100%;
+  margin-bottom: 32rpx;
+}
+
+.settle-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  color: var(--text);
+  border-bottom: 1rpx solid var(--border);
+}
+
+.settle-row:last-child {
+  border-bottom: none;
+}
+
+.settle-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  width: 100%;
+}
+
+.settle-actions .btn {
+  width: 100%;
+  height: 88rpx;
+}
+
+/* ========== 高原反应警告 ========== */
+.high-alt-warning {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  width: 100%;
+  padding: 20rpx 24rpx;
+  background: rgba(252, 129, 129, 0.1);
+  border: 1rpx solid rgba(252, 129, 129, 0.2);
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.ha-icon {
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.ha-info {
+  flex: 1;
+}
+
+.ha-title {
+  font-size: 26rpx;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.ha-desc {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+  line-height: 1.5;
+}
+
+.special-event-text {
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+/* ========== 五彩纸屑庆祝动画 ========== */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 4rpx;
+  top: -20rpx;
+}
+
+.confetti-piece.c1 {
+  left: 15%;
+  background: #fc8181;
+  animation: confettiFall 2.5s ease-in 0.1s infinite;
+}
+.confetti-piece.c2 {
+  left: 30%;
+  background: #68d391;
+  animation: confettiFallLeft 2.8s ease-in 0.3s infinite;
+}
+.confetti-piece.c3 {
+  left: 45%;
+  background: #4fd1c5;
+  animation: confettiFallRight 2.3s ease-in 0s infinite;
+}
+.confetti-piece.c4 {
+  left: 55%;
+  background: #f6ad55;
+  animation: confettiFall 3s ease-in 0.5s infinite;
+}
+.confetti-piece.c5 {
+  left: 65%;
+  background: #b794f4;
+  animation: confettiFallLeft 2.6s ease-in 0.2s infinite;
+}
+.confetti-piece.c6 {
+  left: 75%;
+  background: #f6e05e;
+  animation: confettiFallRight 2.4s ease-in 0.4s infinite;
+}
+.confetti-piece.c7 {
+  left: 85%;
+  background: #63b3ed;
+  animation: confettiFall 2.7s ease-in 0.15s infinite;
+}
+.confetti-piece.c8 {
+  left: 25%;
+  background: #fc8181;
+  animation: confettiFallRight 2.9s ease-in 0.35s infinite;
+}
+
+/* 庆祝弹跳入场 */
+.settle-card.celebrate-in {
+  animation: celebrateBounce 0.5s ease-out;
+}
+
+/* ========== 成就解锁弹窗 ========== */
+.ach-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ach-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.ach-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 480rpx;
+  background: linear-gradient(180deg, #2d1b4e 0%, #111c30 100%);
+  border-radius: 32rpx;
+  padding: 56rpx 40rpx 40rpx;
+  border: 1rpx solid rgba(183, 148, 244, 0.3);
+  animation: popIn 0.3s ease-out;
+  overflow: hidden;
+}
+
+/* 金色光晕扩散 */
+.ach-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200rpx;
+  height: 200rpx;
+  margin-top: -100rpx;
+  margin-left: -100rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(183, 148, 244, 0.4), transparent 70%);
+  animation: goldenGlow 2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* 星光粒子 */
+.ach-stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.ach-star {
+  position: absolute;
+  font-size: 18rpx;
+  color: #f6e05e;
+  opacity: 0;
+}
+
+.ach-star.s1 {
+  top: 15%;
+  left: 10%;
+  animation: starTwinkle 1.5s ease-in-out 0s infinite;
+}
+.ach-star.s2 {
+  top: 20%;
+  right: 12%;
+  animation: starTwinkle 1.8s ease-in-out 0.4s infinite;
+}
+.ach-star.s3 {
+  bottom: 25%;
+  left: 8%;
+  animation: starTwinkle 2s ease-in-out 0.8s infinite;
+}
+.ach-star.s4 {
+  bottom: 20%;
+  right: 10%;
+  animation: starTwinkle 1.6s ease-in-out 1.2s infinite;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.ach-sparkle {
+  position: absolute;
+  top: 20rpx;
+  right: 24rpx;
+  font-size: 40rpx;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(1.2) rotate(15deg); }
+}
+
+.ach-big-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.ach-label {
+  font-size: 24rpx;
+  color: #b794f4;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.ach-name {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 32rpx;
+}
+
+.ach-dismiss {
+  width: 100%;
+  height: 80rpx;
+  font-size: 30rpx;
+  background: linear-gradient(135deg, #b794f4, #805ad5) !important;
+  color: #fff !important;
+}
+
+/* ========== 游戏关卡入口 ========== */
+.game-challenge-section {
+  width: 100%;
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.1);
+}
+
+.gc-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.gc-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.gc-count {
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+.gc-games {
+  display: flex;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  overflow-x: auto;
+}
+
+.gc-game-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 20rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16rpx;
+  min-width: 120rpx;
+}
+
+.gc-game-icon {
+  font-size: 40rpx;
+  margin-bottom: 8rpx;
+}
+
+.gc-game-name {
+  font-size: 22rpx;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.gc-hint {
+  font-size: 24rpx;
+  color: var(--accent2);
+  text-align: center;
+  margin-bottom: 16rpx;
+}
+
+.gc-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50rpx;
+  height: 80rpx;
+  font-size: 30rpx;
+}
+
+.gc-skip {
+  margin-top: 12rpx;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1rpx solid var(--border);
+}
+
+/* ========== 游戏结果汇总 ========== */
+.game-summary-section {
+  width: 100%;
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.15);
+}
+
+.gs-header {
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+
+.gs-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.gs-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 24rpx;
+}
+
+.gs-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gs-stat-value {
+  font-size: 48rpx;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.gs-stat-value.gs-gold {
+  color: #ffd700;
+}
+
+.gs-stat-label {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+}
+
+.gs-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.gs-result-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 12rpx 16rpx;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12rpx;
+}
+
+.gs-result-icon {
+  font-size: 32rpx;
+}
+
+.gs-result-name {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text);
+}
+
+.gs-result-status {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.gs-result-status.win {
+  color: #27ae60;
+}
+
+.gs-result-status.lose {
+  color: #e74c3c;
+}

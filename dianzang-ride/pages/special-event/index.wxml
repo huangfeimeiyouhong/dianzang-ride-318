@@ -1,0 +1,64 @@
+<view class="spe-page">
+  <view class="spe-close safe-top" bindtap="onClose">✕</view>
+
+  <block wx:if="{{event && !showResult}}">
+    <!-- 事件头部 -->
+    <view class="spe-header">
+      <text class="spe-big-icon">{{event.icon}}</text>
+      <view class="spe-type-tag type-{{event.type}}">{{event.type === 'story' ? '故事' : event.type === 'challenge' ? '挑战' : '庆典'}}</view>
+    </view>
+
+    <view class="spe-name">{{event.name}}</view>
+
+    <!-- 事件描述 -->
+    <view class="spe-story card">
+      <text class="spe-story-text">{{event.desc}}</text>
+    </view>
+
+    <!-- 选择项 -->
+    <view wx:if="{{event.choices && event.choices.length > 0}}" class="spe-choices">
+      <view class="spe-choices-title">你的选择</view>
+      <view wx:for="{{event.choices}}" wx:key="index" class="spe-choice {{selectedChoice === index ? 'selected' : ''}}"
+        bindtap="onSelectChoice" data-index="{{index}}">
+        <view class="choice-radio">
+          <view class="choice-radio-inner {{selectedChoice === index ? 'active' : ''}}"></view>
+        </view>
+        <view class="choice-info">
+          <view class="choice-text">{{item.text}}</view>
+          <view class="choice-desc">{{item.desc}}</view>
+          <view wx:if="{{item.penalty}}" class="choice-penalty">
+            <text wx:if="{{item.penalty.energy < 0}}">⚡{{item.penalty.energy}} </text>
+            <text wx:if="{{item.penalty.mood < 0}}">😊{{item.penalty.mood}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 基础奖励预览 -->
+    <view class="spe-reward-preview card">
+      <view class="reward-preview-title">奖励</view>
+      <view class="reward-preview-items">
+        <text wx:if="{{event.rewards.coins}}">🪙+{{event.rewards.coins}}  </text>
+        <text wx:if="{{event.rewards.energy}}">⚡+{{event.rewards.energy}}  </text>
+        <text wx:if="{{event.rewards.mood}}">😊+{{event.rewards.mood}}  </text>
+        <text wx:if="{{event.rewards.itemName}}">🎁{{event.rewards.itemName}}  </text>
+        <text wx:if="{{event.rewards.title}}">🎖{{event.rewards.title}}</text>
+      </view>
+    </view>
+
+    <button class="btn btn-primary spe-confirm safe-bottom" bindtap="onConfirm">{{alreadyCompleted ? '已完成' : '确认'}}</button>
+  </block>
+
+  <!-- 结果页 -->
+  <block wx:if="{{showResult}}">
+    <view class="spe-result">
+      <view class="result-icon-wrap">
+        <text class="result-sparkle">✨</text>
+        <text class="result-icon">{{event.icon}}</text>
+      </view>
+      <view class="result-title">{{event.name}} 完成！</view>
+      <view class="result-message card">{{resultMessage}}</view>
+      <button class="btn btn-primary result-btn safe-bottom" bindtap="onClose">继续旅途</button>
+    </view>
+  </block>
+</view>

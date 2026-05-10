@@ -1,0 +1,59 @@
+<!-- pages/profile/profile.wxml - 个人中心页面 -->
+<view class="page-container">
+  <!-- 顶部状态栏 -->
+  <view class="status-bar">
+    <view class="energy-display" bindtap="showEnergyDetails">
+      <view class="energy-icon">⚡</view>
+      <text class="energy-value {{energyAnimating ? 'animate' : ''}}">{{energy}}</text>
+    </view>
+    <view class="level-badge" bindtap="showLevelDetails">
+      Lv.{{level}}
+    </view>
+  </view>
+
+  <!-- 个人资料头部 -->
+  <view class="profile-header">
+    <view class="avatar-container" bindtap="changeAvatar">
+      <image class="avatar" src="{{avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="avatar-edit">📷</view>
+    </view>
+    <text class="nickname">{{nickname}}</text>
+    <text class="signature">{{signature || '暂无签名'}}</text>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-section">
+    <view class="stat-card" wx:for="{{statCards}}" wx:key="label" bindtap="viewStatDetails" data-type="{{item.type}}">
+      <text class="stat-value">{{item.value}}</text>
+      <text class="stat-label">{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-item" wx:for="{{menuItems}}" wx:key="title" bindtap="navigateTo" data-url="{{item.url}}">
+      <view class="menu-icon">{{item.icon}}</view>
+      <text class="menu-title">{{item.title}}</text>
+      <text class="menu-arrow">→</text>
+    </view>
+  </view>
+
+  <!-- 成就展示 -->
+  <view class="achievement-section">
+    <view class="section-header">
+      <text class="section-title">🏆 最近成就</text>
+      <text class="section-more" bindtap="viewAllAchievements">查看全部</text>
+    </view>
+    <scroll-view class="achievement-list" scroll-x="true">
+      <view class="achievement-item" wx:for="{{recentAchievements}}" wx:key="id">
+        <view class="achievement-icon">{{item.icon}}</view>
+        <text class="achievement-name">{{item.name}}</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>
+
+<!-- Toast -->
+<view class="toast {{showToast ? 'show' : ''}}" wx:if="{{showToast}}">
+  <text>{{toastMessage}}</text>
+</view>

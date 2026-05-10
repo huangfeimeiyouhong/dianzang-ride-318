@@ -1,0 +1,18 @@
+<!--components/event-toast/index.wxml  事件触发弹窗-->
+<view class="overlay" wx:if="{{show}}" catchtouchmove="noop">
+  <view class="toast-card {{show ? 'toast-enter' : ''}}">
+    <!-- 事件图标 -->
+    <view class="toast-icon">{{icon}}</view>
+
+    <!-- 事件名称 -->
+    <view class="toast-title">{{title}}</view>
+
+    <!-- 事件描述 -->
+    <view class="toast-desc">{{desc}}</view>
+
+    <!-- 接受按钮 -->
+    <button class="btn btn-primary toast-btn" bindtap="handleAccept">
+      接受挑战
+    </button>
+  </view>
+</view>

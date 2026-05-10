@@ -1,0 +1,26 @@
+<!--components/ad-modal/index.wxml  广告复活弹窗-->
+<view class="overlay" wx:if="{{show}}" catchtouchmove="noop">
+  <view class="ad-card {{show ? 'ad-enter' : ''}}">
+    <!-- 失败图标 -->
+    <view class="ad-icon-wrap">
+      <text class="ad-icon">💀</text>
+    </view>
+
+    <!-- 标题 -->
+    <view class="ad-title">{{title}}</view>
+
+    <!-- 惩罚说明 -->
+    <view class="ad-penalty">{{penalty}}</view>
+
+    <!-- 看广告按钮 -->
+    <button class="btn btn-primary ad-btn" bindtap="handleAd">
+      <text class="ad-btn-icon">🎬</text>
+      看广告复活
+    </button>
+
+    <!-- 跳过链接 -->
+    <view class="ad-skip" bindtap="handleSkip">
+      跳过，接受惩罚
+    </view>
+  </view>
+</view>

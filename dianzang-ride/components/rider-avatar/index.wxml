@@ -1,0 +1,7 @@
+<!--components/rider-avatar/index.wxml  骑手头像组件-->
+<view
+  class="avatar {{bordered ? 'avatar--bordered' : ''}}"
+  style="width:{{size}}rpx;height:{{size}}rpx;background-color:{{color}};border-color:{{borderColor}};"
+>
+  <text class="avatar-emoji" style="font-size:{{emojiSize}}rpx">{{emoji}}</text>
+</view>

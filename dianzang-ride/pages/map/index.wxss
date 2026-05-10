@@ -1,0 +1,622 @@
+.map-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+}
+
+/* ========== 天气指示器 ========== */
+.weather-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8rpx 32rpx;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.weather-icon {
+  font-size: 30rpx;
+}
+
+.weather-name {
+  font-size: 24rpx;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.weather-desc {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-left: 8rpx;
+}
+
+.weather-cost {
+  flex-shrink: 0;
+}
+
+.cost-badge {
+  font-size: 20rpx;
+  color: var(--danger);
+  background: rgba(252, 129, 129, 0.12);
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+  font-weight: 600;
+}
+
+/* ========== 顶部状态栏 ========== */
+.status-bar { padding: 12rpx 32rpx; background: rgba(0, 0, 0, 0.3); }
+.status-row { display: flex; align-items: center; justify-content: space-between; }
+.status-item { display: flex; align-items: center; gap: 8rpx; }
+.status-item.location { flex: 1; justify-content: center; }
+.status-label { font-size: 22rpx; color: var(--text-muted); }
+.status-value { font-size: 26rpx; color: var(--text); font-weight: 600; }
+
+/* ========== 数据栏 ========== */
+.stats-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12rpx; padding: 16rpx 24rpx; }
+.stat-card { display: flex; align-items: center; gap: 14rpx; background: var(--bg-card); border-radius: 14rpx; padding: 14rpx 16rpx; }
+.stat-icon { font-size: 32rpx; }
+.stat-info { flex: 1; min-width: 0; }
+.stat-label { font-size: 18rpx; color: var(--text-muted); margin-bottom: 3rpx; }
+.stat-bar-wrap { width: 100%; height: 8rpx; background: rgba(255, 255, 255, 0.08); border-radius: 4rpx; margin: 4rpx 0; overflow: hidden; }
+.stat-bar-fill { height: 100%; border-radius: 4rpx; transition: width 0.5s ease; }
+.stat-bar-fill.energy { background: linear-gradient(90deg, var(--accent), #38b2ac); }
+.stat-bar-fill.mood { background: linear-gradient(90deg, var(--accent2), #f6e05e); }
+.stat-bar-fill.durability { background: linear-gradient(90deg, #68d391, #38a169); }
+.stat-bar-fill.adapt { background: linear-gradient(90deg, #b794f4, #805ad5); }
+.stat-num { font-size: 18rpx; color: var(--text-muted); }
+.stat-num.highlight { font-size: 26rpx; color: var(--accent); font-weight: 700; margin-top: 2rpx; }
+.stat-num.coin-text { font-size: 26rpx; color: var(--accent2); font-weight: 700; margin-top: 2rpx; }
+
+/* ========== 路线滚动区 ========== */
+.route-scroll { flex: 1; padding: 16rpx 32rpx; }
+.route-line { display: flex; flex-direction: column; padding-bottom: 120rpx; }
+.station-node { position: relative; display: flex; align-items: flex-start; padding-left: 60rpx; min-height: 120rpx; margin-bottom: 10rpx; }
+.connector { position: absolute; left: 23rpx; top: -60rpx; width: 4rpx; height: 60rpx; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.connector.active { background: rgba(79, 209, 197, 0.15); }
+.connector-fill { width: 100%; background: var(--accent); transition: height 0.5s; }
+.node-dot { position: absolute; left: 0; top: 0; width: 50rpx; height: 50rpx; border-radius: 50%; background: var(--bg-card); border: 3rpx solid var(--border); display: flex; align-items: center; justify-content: center; z-index: 2; transition: all 0.3s; }
+.node-dot.dot-active { border-color: var(--accent); background: rgba(79, 209, 197, 0.15); box-shadow: 0 0 16rpx rgba(79, 209, 197, 0.3); }
+.node-icon { font-size: 24rpx; }
+.station-node.current .node-dot { transform: scale(1.2); border-color: var(--accent); background: var(--accent); }
+.station-node.current .node-icon { font-size: 26rpx; }
+.node-info { flex: 1; padding-top: 4rpx; }
+.node-name { font-size: 28rpx; font-weight: 600; color: var(--text); }
+.station-node.future .node-name { color: var(--text-muted); }
+.station-node.current .node-name { color: var(--accent); }
+.node-meta { display: flex; gap: 16rpx; margin-top: 4rpx; }
+.node-km, .node-elev { font-size: 22rpx; color: var(--text-muted); }
+.rider-bubbles { display: flex; align-items: center; gap: 8rpx; margin-top: 6rpx; }
+.bubble-avatars { display: flex; }
+.bubble-emoji { font-size: 22rpx; margin-right: -6rpx; }
+.bubble-count { font-size: 20rpx; color: var(--accent); margin-left: 8rpx; }
+
+/* 骑友脉冲呼吸灯 */
+.rider-pulse {
+  position: absolute;
+  top: -4rpx;
+  left: -4rpx;
+  right: -4rpx;
+  bottom: -4rpx;
+  border-radius: 50%;
+  border: 3rpx solid var(--success);
+  animation: pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ========== 底部按钮 ========== */
+.bottom-actions { display: flex; gap: 14rpx; padding: 16rpx 32rpx 20rpx; background: linear-gradient(0deg, var(--bg) 60%, transparent); }
+.ride-btn { flex: 2; height: 88rpx; font-size: 30rpx; }
+.quest-btn { flex: 1; height: 88rpx; font-size: 26rpx; }
+.profile-btn { width: 88rpx; height: 88rpx; font-size: 32rpx; padding: 0; flex-shrink: 0; }
+
+/* ========== 每日任务面板 ========== */
+.quest-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+
+.quest-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.quest-sheet {
+  position: relative;
+  width: 100%;
+  max-height: 70vh;
+  background: #111c30;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 32rpx;
+  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.quest-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.quest-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.quest-streak {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  background: rgba(246, 173, 85, 0.15);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  transition: background 0.3s;
+}
+
+.quest-streak.streak-hot {
+  background: rgba(246, 173, 85, 0.25);
+  border: 1rpx solid rgba(246, 173, 85, 0.3);
+}
+
+.streak-fire-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.streak-fire {
+  font-size: 26rpx;
+}
+
+.quest-streak.streak-hot .streak-fire {
+  animation: fireGlow 1.2s ease-in-out infinite;
+}
+
+.streak-fire-aura {
+  position: absolute;
+  top: -8rpx;
+  left: -8rpx;
+  right: -8rpx;
+  bottom: -8rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 173, 85, 0.2), transparent);
+  animation: fireAura 2s ease-in-out infinite;
+}
+
+.streak-num {
+  font-size: 22rpx;
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+.quest-list {
+  max-height: 45vh;
+}
+
+.quest-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 16rpx;
+  background: var(--bg-card);
+  border-radius: 16rpx;
+  margin-bottom: 14rpx;
+}
+
+.quest-item.completed {
+  border: 1rpx solid rgba(104, 211, 145, 0.2);
+}
+
+.quest-left {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.quest-diff-tag {
+  font-size: 18rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  flex-shrink: 0;
+}
+
+.diff-1 { background: rgba(104, 211, 145, 0.15); color: #68d391; }
+.diff-2 { background: rgba(79, 209, 197, 0.15); color: var(--accent); }
+.diff-3 { background: rgba(252, 129, 129, 0.15); color: var(--danger); }
+
+.quest-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.quest-name {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.quest-desc {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  margin-top: 2rpx;
+}
+
+.quest-progress-bar {
+  width: 100%;
+  height: 6rpx;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3rpx;
+  margin-top: 8rpx;
+  overflow: hidden;
+}
+
+.quest-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3rpx;
+  transition: width 0.3s ease;
+}
+
+.quest-progress-text {
+  font-size: 18rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+}
+
+.quest-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  margin-left: 16rpx;
+  flex-shrink: 0;
+}
+
+.quest-reward {
+  font-size: 22rpx;
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+.quest-claim-btn {
+  width: 100rpx !important;
+  height: 56rpx !important;
+  font-size: 22rpx !important;
+  padding: 0 !important;
+}
+
+.quest-claimed {
+  font-size: 20rpx;
+  color: var(--text-muted);
+}
+
+/* ========== 登录奖励弹窗 ========== */
+.reward-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reward-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.reward-card {
+  position: relative;
+  width: 600rpx;
+  background: linear-gradient(180deg, #1a2744 0%, #111c30 100%);
+  border-radius: 32rpx;
+  padding: 48rpx 40rpx;
+  border: 1rpx solid rgba(246, 173, 85, 0.2);
+  animation: popIn 0.3s ease-out;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.reward-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28rpx;
+  position: relative;
+}
+
+.reward-fire-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8rpx;
+}
+
+.reward-fire {
+  font-size: 56rpx;
+}
+
+.reward-header.streak-hot .reward-fire {
+  animation: fireGlow 1s ease-in-out infinite;
+}
+
+.reward-fire-aura {
+  position: absolute;
+  top: -16rpx;
+  left: -16rpx;
+  right: -16rpx;
+  bottom: -16rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 173, 85, 0.3), transparent);
+  animation: fireAura 1.8s ease-in-out infinite;
+}
+
+.reward-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.reward-streak {
+  font-size: 24rpx;
+  color: var(--accent2);
+  margin-top: 4rpx;
+}
+
+.reward-reset-hint {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--danger);
+  margin-bottom: 20rpx;
+  padding: 10rpx;
+  background: rgba(252, 129, 129, 0.1);
+  border-radius: 12rpx;
+}
+
+.reward-cycle {
+  display: flex;
+  justify-content: space-between;
+  gap: 8rpx;
+  margin-bottom: 28rpx;
+}
+
+.reward-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10rpx 6rpx;
+  border-radius: 12rpx;
+  background: var(--bg-card);
+  flex: 1;
+}
+
+.reward-day.today {
+  background: rgba(246, 173, 85, 0.2);
+  border: 1rpx solid rgba(246, 173, 85, 0.4);
+}
+
+.reward-day.claimed {
+  opacity: 0.5;
+}
+
+.reward-day-num {
+  font-size: 16rpx;
+  color: var(--text-muted);
+}
+
+.reward-day-icon {
+  font-size: 28rpx;
+  margin: 4rpx 0;
+}
+
+.reward-day-amount {
+  font-size: 18rpx;
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+.reward-today {
+  background: var(--bg-card);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.reward-today-label {
+  font-size: 20rpx;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.reward-today-content {
+  display: flex;
+  justify-content: center;
+  gap: 24rpx;
+  flex-wrap: wrap;
+}
+
+.reward-coins {
+  font-size: 30rpx;
+  color: var(--accent2);
+  font-weight: 700;
+}
+
+.reward-item-text {
+  font-size: 26rpx;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.reward-claim-btn {
+  width: 100%;
+  height: 88rpx;
+  font-size: 32rpx;
+}
+
+/* ========== 成就解锁弹窗 ========== */
+.ach-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ach-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.ach-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 480rpx;
+  background: linear-gradient(180deg, #2d1b4e 0%, #111c30 100%);
+  border-radius: 32rpx;
+  padding: 56rpx 40rpx 40rpx;
+  border: 1rpx solid rgba(183, 148, 244, 0.3);
+  animation: popIn 0.3s ease-out;
+  overflow: hidden;
+}
+
+/* 金色光晕扩散 */
+.ach-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200rpx;
+  height: 200rpx;
+  margin-top: -100rpx;
+  margin-left: -100rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(183, 148, 244, 0.4), transparent 70%);
+  animation: goldenGlow 2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* 星光粒子 */
+.ach-stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.ach-star {
+  position: absolute;
+  font-size: 18rpx;
+  color: #f6e05e;
+  opacity: 0;
+}
+
+.ach-star.s1 {
+  top: 15%;
+  left: 10%;
+  animation: starTwinkle 1.5s ease-in-out 0s infinite;
+}
+.ach-star.s2 {
+  top: 20%;
+  right: 12%;
+  animation: starTwinkle 1.8s ease-in-out 0.4s infinite;
+}
+.ach-star.s3 {
+  bottom: 25%;
+  left: 8%;
+  animation: starTwinkle 2s ease-in-out 0.8s infinite;
+}
+.ach-star.s4 {
+  bottom: 20%;
+  right: 10%;
+  animation: starTwinkle 1.6s ease-in-out 1.2s infinite;
+}
+
+.ach-sparkle {
+  position: absolute;
+  top: 20rpx;
+  right: 24rpx;
+  font-size: 40rpx;
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.6; transform: scale(1.2) rotate(15deg); }
+}
+
+.ach-big-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.ach-label {
+  font-size: 24rpx;
+  color: #b794f4;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.ach-name {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 32rpx;
+}
+
+.ach-dismiss {
+  width: 100%;
+  height: 80rpx;
+  font-size: 30rpx;
+  background: linear-gradient(135deg, #b794f4, #805ad5) !important;
+  color: #fff !important;
+}

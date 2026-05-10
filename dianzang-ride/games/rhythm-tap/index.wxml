@@ -1,0 +1,41 @@
+<view class="container">
+  <!-- 游戏画布 -->
+  <canvas type="2d" id="game-canvas" class="game-canvas" canvas-id="gameCanvas" style="width: {{canvasW}}px; height: {{canvasH}}px;"></canvas>
+
+  <!-- HUD -->
+  <view class="hud">
+    <view class="combo-box">
+      <text class="combo-label">连击</text>
+      <text class="combo-value">{{combo}}</text>
+    </view>
+    <view class="progress-box">
+      <text class="progress-text">{{hitCount}}/{{targetBeat}} 击中</text>
+      <progress percent="{{progressPct}}" stroke-width="8" activeColor="#ffd700" backgroundColor="#16213e" />
+    </view>
+  </view>
+
+  <!-- 操作提示 -->
+  <view class="hint-box">
+    <text>跟随节拍点击屏幕！</text>
+  </view>
+
+  <!-- 结果弹窗 -->
+  <view wx:if="{{finished}}" class="result-modal">
+    <view class="result-content {{won ? 'win' : 'lose'}}">
+      <text class="result-emoji">{{won ? '🎉' : '😢'}}</text>
+      <text class="result-title">{{won ? '节奏大师！' : '节奏乱了...'}}</text>
+      <text class="result-desc">{{won ? '完美跟上节拍！' : '下次再接再厉'}}</text>
+      <button class="result-btn" bindtap="onBack">返回</button>
+    </view>
+  </view>
+
+  <!-- 广告弹窗 -->
+  <view wx:if="{{showAd}}" class="ad-modal">
+    <view class="ad-content">
+      <text class="ad-title">观看广告复活</text>
+      <text class="ad-desc">观看完整广告即可重新挑战</text>
+      <button class="ad-btn" bindtap="onAdRevive">观看广告</button>
+      <button class="skip-btn" bindtap="onAdSkip">跳过（接受惩罚）</button>
+    </view>
+  </view>
+</view>

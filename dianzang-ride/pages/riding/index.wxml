@@ -1,0 +1,141 @@
+<view class="riding-page">
+  <block wx:if="{{!finished}}">
+    <view class="scene-area">
+      <view class="sky">
+        <view class="cloud cloud-1">☁️</view>
+        <view class="cloud cloud-2">⛅</view>
+      </view>
+      <view class="terrain-desc">{{terrainDesc}}</view>
+      <view class="road-area">
+        <view class="road-lines {{animating ? 'animating' : ''}}">
+          <view class="road-line" wx:for="{{6}}" wx:key="*this"></view>
+        </view>
+        <view class="rider-sprite {{animating ? 'riding' : ''}}">
+          <text class="rider-emoji">{{bikeEmoji}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="km-display">
+      <view class="km-number">{{displayKm}}</view>
+      <view class="km-unit">km</view>
+    </view>
+    <view class="progress-area">
+      <view class="progress-labels"><text>{{fromStation}}</text><text>{{toStation}}</text></view>
+      <view class="progress-bar-wrap"><view class="progress-bar-fill" style="width: {{progressPct}}%"></view></view>
+      <view class="progress-km"><text>{{riddenKm}} / {{segmentKm}} km</text></view>
+    </view>
+    <view class="ride-info">
+      <view class="info-item"><text class="info-icon">⚡</text><text class="info-label">体能消耗</text><text class="info-value text-danger">-{{energyCost}}</text></view>
+      <view class="info-item"><text class="info-icon">⛰️</text><text class="info-label">当前海拔</text><text class="info-value">{{currentElev}}m</text></view>
+      <view class="info-item"><text class="info-icon">📏</text><text class="info-label">消耗系数</text><text class="info-value">x{{costMultiplier}}</text></view>
+    </view>
+  </block>
+
+  <block wx:if="{{finished}}">
+    <!-- 五彩纸屑庆祝动画 -->
+    <view class="confetti-container" wx:if="{{reachedNext}}">
+      <view class="confetti-piece c1"></view>
+      <view class="confetti-piece c2"></view>
+      <view class="confetti-piece c3"></view>
+      <view class="confetti-piece c4"></view>
+      <view class="confetti-piece c5"></view>
+      <view class="confetti-piece c6"></view>
+      <view class="confetti-piece c7"></view>
+      <view class="confetti-piece c8"></view>
+    </view>
+    <view class="settle-card {{reachedNext ? 'celebrate-in' : ''}}">
+      <view class="settle-header">
+        <text class="settle-icon">{{reachedNext ? '🎉' : '🏁'}}</text>
+        <text class="settle-title">{{reachedNext ? '到达新站点！' : '骑行结束'}}</text>
+      </view>
+      <view wx:if="{{reachedNext}}" class="new-station-name">{{newStationName}}</view>
+
+      <!-- 高原反应警告 -->
+      <view wx:if="{{highAltSickness}}" class="high-alt-warning">
+        <text class="ha-icon">⚠️</text>
+        <view class="ha-info">
+          <view class="ha-title">高原反应</view>
+          <view class="ha-desc">呼吸困难，体能消耗增加。使用氧气瓶或保暖衣物缓解。</view>
+        </view>
+      </view>
+
+      <view class="settle-stats">
+        <view class="settle-row"><text>本次骑行</text><text class="text-accent">+{{actualKm}} km</text></view>
+        <view class="settle-row"><text>体能消耗</text><text class="text-danger">-{{energyCost}}</text></view>
+        <view class="settle-row"><text>剩余体能</text><text>{{remainEnergy}}/200</text></view>
+        <view class="settle-row"><text>金币收入</text><text class="text-accent2">+{{coinsEarned}} 🪙</text></view>
+        <view class="settle-row" wx:if="{{eventTriggered}}"><text>触发事件</text><text class="text-accent2">{{eventIcon}} {{eventName}}</text></view>
+        <view class="settle-row" wx:if="{{hasSpecialEvent}}"><text>特色事件</text><text class="special-event-text">{{specialEventIcon}} {{specialEventName}}</text></view>
+      </view>
+      <!-- 游戏关卡入口 -->
+      <view wx:if="{{inGameSequence && gameQueue.length > 0 && !showGameSummary}}" class="game-challenge-section">
+        <view class="gc-header">
+          <text class="gc-title">🎮 途中小游戏</text>
+          <text class="gc-count">（{{gameQueue.length}}关挑战）</text>
+        </view>
+        <view class="gc-games">
+          <view class="gc-game-item" wx:for="{{gameQueue}}" wx:key="id">
+            <text class="gc-game-icon">{{item.icon}}</text>
+            <text class="gc-game-name">{{item.name}}</text>
+          </view>
+        </view>
+        <view class="gc-hint">完成挑战可获得额外金币！</view>
+        <button class="btn btn-primary gc-btn" bindtap="onStartGames">开始挑战</button>
+        <button class="btn btn-ghost gc-skip" bindtap="onSkipGames">跳过挑战</button>
+      </view>
+
+      <!-- 游戏结果汇总 -->
+      <view wx:if="{{showGameSummary && gameResults.length > 0}}" class="game-summary-section">
+        <view class="gs-header">
+          <text class="gs-title">🎯 挑战结算</text>
+        </view>
+        <view class="gs-stats">
+          <view class="gs-stat">
+            <text class="gs-stat-value">{{totalWins}}</text>
+            <text class="gs-stat-label">胜利</text>
+          </view>
+          <view class="gs-stat">
+            <text class="gs-stat-value">{{gameResults.length - totalWins}}</text>
+            <text class="gs-stat-label">失败</text>
+          </view>
+          <view class="gs-stat">
+            <text class="gs-stat-value gs-gold">+{{totalCoinsEarned}}</text>
+            <text class="gs-stat-label">金币</text>
+          </view>
+        </view>
+        <view class="gs-results">
+          <view class="gs-result-item" wx:for="{{gameResults}}" wx:key="gameId">
+            <text class="gs-result-icon">{{item.icon}}</text>
+            <text class="gs-result-name">{{item.name}}</text>
+            <text class="gs-result-status {{item.won ? 'win' : 'lose'}}">{{item.won ? '✓' : '✗'}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="settle-actions">
+        <button wx:if="{{hasSpecialEvent}}" class="btn btn-warning" bindtap="onSpecialEventTap">{{specialEventIcon}} {{specialEventName}}</button>
+        <button wx:if="{{eventTriggered && eventGamePage}}" class="btn btn-primary" bindtap="onEventTap">{{eventIcon}} 进入事件</button>
+        <button class="btn btn-ghost" bindtap="onBackToMap">返回地图</button>
+      </view>
+    </view>
+  </block>
+
+  <!-- 成就解锁弹窗 -->
+  <view class="ach-modal" wx:if="{{showAchievement}}">
+    <view class="ach-overlay" bindtap="onDismissAchievement"></view>
+    <view class="ach-card">
+      <view class="ach-glow"></view>
+      <view class="ach-stars">
+        <view class="ach-star s1">⭐</view>
+        <view class="ach-star s2">✦</view>
+        <view class="ach-star s3">⭐</view>
+        <view class="ach-star s4">✦</view>
+      </view>
+      <view class="ach-sparkle">✨</view>
+      <text class="ach-big-icon">{{achievementIcon}}</text>
+      <view class="ach-label">成就解锁</view>
+      <view class="ach-name">{{achievementName}}</view>
+      <button class="btn ach-dismiss" bindtap="onDismissAchievement">太棒了！</button>
+    </view>
+  </view>
+</view>

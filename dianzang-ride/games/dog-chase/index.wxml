@@ -1,0 +1,42 @@
+<!--games/dog-chase/index.wxml  野狗追咬关卡-->
+<view class="game-wrap">
+  <!-- HUD -->
+  <view class="game-hud">
+    <view class="hud-distance">
+      <text class="hud-dist-label">安全距离</text>
+      <view class="hud-dist-bar">
+        <view class="hud-dist-fill {{distancePct < 30 ? 'hud-dist--danger' : ''}}" style="width:{{distancePct}}%"></view>
+      </view>
+    </view>
+    <view class="hud-timer">{{remainSec}}s</view>
+  </view>
+
+  <!-- 游戏画布 -->
+  <canvas
+    type="2d"
+    id="game-canvas"
+    class="game-canvas"
+    style="width:{{canvasW}}px;height:{{canvasH}}px"
+    bindtouchstart="onTap"
+  ></canvas>
+
+  <!-- 提示 -->
+  <view class="tap-hint" wx:if="{{!started}}">
+    <text>疯狂点击屏幕加速！</text>
+  </view>
+
+  <!-- 结算 -->
+  <view class="game-result" wx:if="{{finished}}">
+    <view class="result-icon">{{won ? '🏃' : '🐕'}}</view>
+    <view class="result-title">{{won ? '成功甩掉野狗！' : '被野狗追上了...'}}</view>
+    <button class="btn btn-primary result-btn" bindtap="onBack">返回</button>
+  </view>
+
+  <ad-modal
+    show="{{showAd}}"
+    title="被野狗追上"
+    penalty="体能 -15，心情 -10"
+    bind:ad="onAdRevive"
+    bind:skip="onAdSkip"
+  />
+</view>

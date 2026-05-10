@@ -1,0 +1,122 @@
+<!-- pages/index/index.wxml - 首页（主地图界面） -->
+<view class="page-container">
+  <!-- Status Bar -->
+  <view class="status-bar">
+    <text class="status-title">骑行318</text>
+    <view class="energy-badge">
+      <text>🔋 </text>
+      <text id="energy-value">{{energy}}</text>
+    </view>
+  </view>
+
+  <!-- HUD (Head-Up Display) -->
+  <view class="hud">
+    <view class="hud-item">
+      <text class="hud-icon">⚡</text>
+      <text class="hud-value">体能: {{stamina}}/{{maxStamina}}</text>
+    </view>
+    <view class="hud-item">
+      <text class="hud-icon">📏</text>
+      <text class="hud-value">里程: {{distance}}km</text>
+    </view>
+    <view class="hud-item">
+      <text class="hud-icon">⛰️</text>
+      <text class="hud-value">海拔: {{altitude}}m</text>
+    </view>
+  </view>
+
+  <!-- Map Area -->
+  <scroll-view class="map-area" scroll-y="true">
+    <!-- Mountains (SVG converted to view) -->
+    <view class="mountain-layer">
+      <view class="mountain-far"></view>
+      <view class="mountain-near mountain-near-1"></view>
+      <view class="mountain-near mountain-near-2"></view>
+    </view>
+
+    <!-- Road Path -->
+    <view class="road-path">
+      <view class="road-line"></view>
+      <view class="road-dash"></view>
+    </view>
+
+    <!-- Character on Bike -->
+    <view class="character">
+      <view class="bike">
+        <view class="wheel wheel-front"></view>
+        <view class="wheel wheel-rear"></view>
+        <view class="bike-frame"></view>
+      </view>
+      <view class="rider">
+        <view class="rider-head"></view>
+        <view class="rider-body"></view>
+        <view class="helmet"></view>
+      </view>
+    </view>
+
+    <!-- City Markers -->
+    <view class="city-marker" style="top: 120rpx; left: 250rpx;" bindtap="showCityInfo" data-city="康定">
+      <view class="city-dot">🏔️</view>
+      <text class="city-name">康定</text>
+    </view>
+
+    <view class="city-marker" style="top: 180rpx; left: 180rpx;" bindtap="showCityInfo" data-city="雅安">
+      <view class="city-dot">🍵</view>
+      <text class="city-name">雅安</text>
+    </view>
+
+    <view class="city-marker" style="top: 80rpx; left: 300rpx;" bindtap="showCityInfo" data-city="新都桥">
+      <view class="city-dot">📸</view>
+      <text class="city-name">新都桥</text>
+    </view>
+  </scroll-view>
+
+  <!-- Progress Bar -->
+  <view class="progress-section">
+    <view class="progress-label">
+      <text>{{traveledDistance}}km / {{totalDistance}}km</text>
+      <text>{{progressPercent}}%</text>
+    </view>
+    <view class="progress-bar-bg">
+      <view class="progress-bar-fill" style="width: {{progressPercent}}%;"></view>
+    </view>
+    <view class="progress-dot" style="left: {{progressPercent}}%;"></view>
+  </view>
+
+  <!-- City Info Card -->
+  <view class="city-card" wx:if="{{showCityCard}}">
+    <view class="city-header">
+      <text class="city-name-title">{{cityIcon}} {{currentCity}}</text>
+      <text class="city-distance">{{cityDistance}}</text>
+    </view>
+    <view class="city-divider"></view>
+    <text class="city-minigame">{{cityMinigame}}</text>
+    <text class="city-difficulty">{{cityDifficulty}}</text>
+    <button class="btn-primary" bindtap="startMinigame">开始小游戏</button>
+  </view>
+
+  <!-- Bottom Navigation -->
+  <view class="bottom-nav safe-area-bottom">
+    <view class="nav-item" bindtap="navigateTo" data-page="map">
+      <view class="nav-icon {{currentPage === 'map' ? 'active' : 'inactive'}}">🗺️</view>
+      <text class="nav-label {{currentPage === 'map' ? 'active' : ''}}">地图</text>
+    </view>
+    <view class="nav-item" bindtap="navigateTo" data-page="backpack">
+      <view class="nav-icon {{currentPage === 'backpack' ? 'active' : 'inactive'}}">🎒</view>
+      <text class="nav-label {{currentPage === 'backpack' ? 'active' : ''}}">背包</text>
+    </view>
+    <view class="nav-item" bindtap="navigateTo" data-page="social">
+      <view class="nav-icon {{currentPage === 'social' ? 'active' : 'inactive'}}">👥</view>
+      <text class="nav-label {{currentPage === 'social' ? 'active' : ''}}">社交</text>
+    </view>
+    <view class="nav-item" bindtap="navigateTo" data-page="profile">
+      <view class="nav-icon {{currentPage === 'profile' ? 'active' : 'inactive'}}">👤</view>
+      <text class="nav-label {{currentPage === 'profile' ? 'active' : ''}}">我的</text>
+    </view>
+  </view>
+</view>
+
+<!-- Toast Notification -->
+<view class="toast {{showToast ? 'show' : ''}}" wx:if="{{showToast}}">
+  <text>{{toastMessage}}</text>
+</view>

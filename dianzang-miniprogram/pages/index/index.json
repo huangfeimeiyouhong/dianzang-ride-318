@@ -1,0 +1,9 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "骑行318",
+  "navigationBarBackgroundColor": "#1976D2",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#E3F2FD",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark"
+}
