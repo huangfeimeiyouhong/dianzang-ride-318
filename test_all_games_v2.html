@@ -193,6 +193,16 @@
             border-bottom: 1px solid #E2E8F0;
         }
 
+        .file-item a {
+            color: #475569;
+            text-decoration: none;
+        }
+
+        .file-item a:hover {
+            color: #667eea;
+            text-decoration: underline;
+        }
+
         .file-item:last-child {
             border-bottom: none;
         }
@@ -222,14 +232,14 @@
 
         <div class="info-box">
             <h3>📋 测试说明</h3>
-            <p><strong>方法1：</strong>直接复制下方文件路径，在浏览器中打开</p>
-            <p><strong>方法2：</strong>在VS Code中右键文件 → Open with Live Server</p>
-            <p><strong>方法3：</strong>双击HTML文件在默认浏览器中打开</p>
+            <p><strong>方法1：</strong>点击下方游戏卡片，直接进入对应小游戏</p>
+            <p><strong>方法2：</strong>手机访问 GitHub Pages 地址后，点击卡片进行真机测试</p>
+            <p><strong>方法3：</strong>本地调试时可用 Live Server 或 Python HTTP 服务打开本页</p>
         </div>
 
         <div class="info-box">
             <h3>🎯 所有小游戏文件列表</h3>
-            <p>复制以下路径到浏览器地址栏，或在文件管理器中双击打开：</p>
+            <p>点击以下链接即可打开对应小游戏：</p>
             <div class="file-list" id="fileList">
                 <!-- Files will be listed here -->
             </div>
@@ -265,14 +275,15 @@
             { icon: '🙏', city: '拉萨', name: '朝圣之路', file: 'prototype_minigame_lhasa.html', type: '朝圣模拟' }
         ];
 
-        const basePath = 'D:\\FFOutput\\滇藏骑行游戏\\';
-
         // Render file list
         const fileList = document.getElementById('fileList');
         games.forEach(game => {
             const item = document.createElement('div');
             item.className = 'file-item';
-            item.textContent = basePath + game.file;
+            const link = document.createElement('a');
+            link.href = game.file;
+            link.textContent = game.file;
+            item.appendChild(link);
             fileList.appendChild(item);
         });
 
@@ -281,45 +292,27 @@
         games.forEach((game, index) => {
             const card = document.createElement('div');
             card.className = 'game-card';
+            card.addEventListener('click', () => openGame(index));
             
             card.innerHTML = `
                 <div class="game-icon">${game.icon}</div>
                 <div class="game-city">${game.city}</div>
                 <div class="game-name">${game.name}</div>
                 <span class="game-type">${game.type}</span>
-                <button class="test-btn" onclick="copyPath(${index})">
-                    📋 复制路径并打开
+                <button class="test-btn" type="button" onclick="event.stopPropagation(); openGame(${index})">
+                    进入游戏
                 </button>
             `;
 
             grid.appendChild(card);
         });
 
-        function copyPath(index) {
+        function openGame(index) {
             const game = games[index];
-            const fullPath = basePath + game.file;
-            
-            // Copy to clipboard
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(fullPath).then(() => {
-                    alert(`✅ 路径已复制！\n\n请：\n1. 打开浏览器\n2. 粘贴路径到地址栏\n3. 按回车打开\n\n路径：${fullPath}`);
-                }).catch(() => {
-                    showManualCopy(fullPath);
-                });
-            } else {
-                showManualCopy(fullPath);
-            }
+            window.location.href = game.file;
         }
 
-        function showManualCopy(path) {
-            alert(`请手动复制以下路径到浏览器地址栏：\n\n${path}`);
-        }
-
-        // Auto-open instruction
-        setTimeout(() => {
-            console.log('💡 提示：所有游戏文件都在 D:\\FFOutput\\滇藏骑行游戏\\ 目录下');
-            console.log('你可以直接在文件管理器中双击HTML文件打开测试');
-        }, 1000);
+        console.log('点击游戏卡片即可直接进入对应小游戏');
     </script>
 </body>
 </html>
